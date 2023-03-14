@@ -1,0 +1,60 @@
+.backdrop {
+  -moz-filter: blur(8px);
+  -webkit-filter: blur(8px);
+  -ms-filter: blur(8px);
+  filter: blur(8px);
+}
+
+.panel {
+  padding: 4em 4em 2em 4em;
+  background: rgba(36, 38, 41, 0.975);
+  max-height: calc(80vh - 4em);
+  z-index: 10001;
+  bottom: 56px;
+  /* margin-bottom: 56px; */
+}
+
+.panel-title {
+  color: #fff;
+  margin-bottom: 1em;
+  font-size: 1.25em;
+  font-weight: 300;
+  letter-spacing: 0.1em;
+}
+
+.panel-p {
+  color: #a0a0a1 !important;
+  font-weight: 300;
+  font-size: 11pt;
+}
+
+.split {
+  max-width: 100%;
+  width: 75em;
+}
+
+.internal {
+  width: 50%;
+}
+
+@media screen and (max-width: 980px) {
+  .internal {
+    width: 100%;
+  }
+}
+
+@media screen and (max-width: 736px) {
+  .panel-title {
+    font-size: 1em;
+  }
+
+  .panel {
+    padding: 4em 2em 2em 2em;
+  }
+}
+
+.copyright {
+  padding-top: 20px;
+  color: #505051;
+  font-size: 0.9em;
+}

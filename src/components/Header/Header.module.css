@@ -1,0 +1,37 @@
+#navbar {
+  background: #1f2224;
+  width: 100%;
+  letter-spacing: 0.1em;
+  padding: 8px 22px;
+  font-weight: 300;
+}
+
+#title {
+  color: #a0a0a1;
+  font-size: 1em;
+  display: inline-block;
+  margin: 0;
+  vertical-align: middle;
+  width: 100%;
+  z-index: 10002;
+}
+
+#title a {
+  border: 0;
+  color: inherit;
+}
+
+#title a:hover {
+  color: inherit !important;
+}
+
+#title strong {
+  color: #ffffff;
+}
+
+@media screen and (max-width: 736px) {
+  #navbar {
+    font-size: 0.9em;
+    padding: 8px 0px;
+  }
+}
