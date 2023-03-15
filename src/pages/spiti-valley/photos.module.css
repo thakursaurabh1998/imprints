@@ -1,3 +1,7 @@
+.photo-wrapper {
+  padding: 5px 5px 61px 5px;
+}
+
 #photos {
   /* Prevent vertical gaps */
   line-height: 0;
@@ -8,7 +12,6 @@
   -moz-column-gap: 0px;
   column-count: 3;
   column-gap: 0px;
-  padding: 5px;
 }
 
 #photos img {
@@ -31,7 +34,9 @@
     -moz-column-count: 1;
     -webkit-column-count: 1;
     column-count: 1;
-    padding: 0px;
+  }
+  .photo-wrapper {
+    padding: 0px 0px 56px 0px;
   }
 
   #photos img {
