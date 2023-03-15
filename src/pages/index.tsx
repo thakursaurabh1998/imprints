@@ -1,7 +1,7 @@
 import Head from "next/head";
+import Link from "next/link";
 
 import config from "@/config";
-import Link from "next/link";
 
 export default function Home() {
   return (
