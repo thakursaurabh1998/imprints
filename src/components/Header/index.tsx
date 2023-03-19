@@ -17,8 +17,8 @@ export default function Header() {
   return (
     <Navbar id={styles.navbar} fixed="bottom" variant="dark">
       <Container style={{ margin: 0, maxWidth: "100%" }}>
-        <Navbar.Brand href="#" id={styles.title}>
-          <strong>{config.header.title.toUpperCase()}</strong>{" "}
+        <Navbar.Brand href="/" id={styles.title}>
+          <strong>{config.header.title.toUpperCase()}</strong>&nbsp;
           {config.header.subtitle.toUpperCase()}
         </Navbar.Brand>
         <Nav>

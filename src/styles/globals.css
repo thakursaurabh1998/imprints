@@ -13,8 +13,10 @@ body {
   background-color: #000;
 }
 
-
-body, input, select, textarea {
+body,
+input,
+select,
+textarea {
   color: #a0a0a1;
   font-family: "Source Sans Pro", Helvetica, sans-serif !important;
   font-size: 15pt;
