@@ -5,5 +5,6 @@
     z-index: 10000;
     cursor: pointer;
     border-radius: 50px;
+    max-height: 50px;
     background-color: rgba(127, 127, 127, 0.648);
 }
