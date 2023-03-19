@@ -7,7 +7,7 @@
 
 .panel {
   padding: 3em 4em 4em 4em;
-  background: #202224fa;
+  background: #1f2224;
   max-height: calc(80vh - 3em);
   z-index: 10001;
   bottom: 56px;
@@ -28,8 +28,7 @@
 }
 
 .split {
-  max-width: 100%;
-  width: 75em;
+  width: 100vw;
 }
 
 .internal {

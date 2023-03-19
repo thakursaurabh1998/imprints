@@ -1,5 +1,5 @@
 #navbar {
-  background: #1f2224;
+  background: #161819;
   width: 100%;
   letter-spacing: 0.1em;
   padding: 8px 22px;
@@ -21,6 +21,7 @@
 
 #about a {
   color: #a0a0a1;
+  cursor: pointer;
 }
 
 #title a {
