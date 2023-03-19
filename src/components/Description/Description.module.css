@@ -7,7 +7,7 @@
 
 .panel {
   padding: 4em 4em 2em 4em;
-  background: rgba(36, 38, 41, 0.975);
+  background: #202224fa;
   max-height: calc(80vh - 4em);
   z-index: 10001;
   bottom: 56px;

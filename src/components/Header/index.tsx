@@ -1,33 +1,40 @@
-import { useState } from "react";
-import Nav from "react-bootstrap/Nav";
-import Container from "react-bootstrap/Container";
-import Navbar from "react-bootstrap/Navbar";
+import { Link, Grid } from "@mui/material";
 
 import config from "../../config";
 import styles from "./Header.module.css";
-import Description from "../Description";
 
-export default function Header() {
-  const [show, setShow] = useState(false);
+interface HeaderProps {
+  openDrawer: () => void;
+}
 
-  const handleDescriptionCanvas = () => {
-    setShow(true);
-  };
-
+export default function Header({ openDrawer }: HeaderProps) {
   return (
-    <Navbar id={styles.navbar} fixed="bottom" variant="dark">
-      <Container style={{ margin: 0, maxWidth: "100%" }}>
-        <Navbar.Brand href="/" id={styles.title}>
-          <strong>{config.header.title.toUpperCase()}</strong>&nbsp;
-          {config.header.subtitle.toUpperCase()}
-        </Navbar.Brand>
-        <Nav>
-          <Nav.Link eventKey={1} onClick={handleDescriptionCanvas}>
-            ABOUT
-          </Nav.Link>
-        </Nav>
-        <Description show={show} setShow={setShow} />
-      </Container>
-    </Navbar>
+    <div id={styles.navbar}>
+      <Grid
+        container
+        alignItems="center"
+        justifyContent="start"
+        direction="row"
+        display="flex"
+      >
+        <Grid item xs={10}>
+          <span id={styles.title}>
+            <Link href="/" underline="none">
+              <strong>{config.header.title.toUpperCase()}</strong>&nbsp;
+            </Link>
+            {config.header.subtitle.toUpperCase()}
+          </span>
+        </Grid>
+        <Grid item xs={2}>
+          <Grid container justifyContent="end" direction="row" display="flex">
+            <span id={styles.about}>
+              <Link onClick={openDrawer} underline="none">
+                ABOUT
+              </Link>
+            </span>
+          </Grid>
+        </Grid>
+      </Grid>
+    </div>
   );
 }

@@ -1,9 +1,9 @@
-import Header from "../Header";
+import HeaderDrawer from "../HeaderDrawer";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <>
-      <Header />
+      <HeaderDrawer />
       <main>{children}</main>
     </>
   );

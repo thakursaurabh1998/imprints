@@ -4,6 +4,9 @@
   letter-spacing: 0.1em;
   padding: 8px 22px;
   font-weight: 300;
+  height: 56px;
+  display: flex;
+  align-items: center;
 }
 
 #title {
@@ -14,6 +17,10 @@
   vertical-align: middle;
   width: 100%;
   z-index: 10002;
+}
+
+#about a {
+  color: #a0a0a1;
 }
 
 #title a {
@@ -32,6 +39,6 @@
 @media screen and (max-width: 736px) {
   #navbar {
     font-size: 0.9em;
-    padding: 8px 0px;
+    padding: 8px 8px;
   }
 }
