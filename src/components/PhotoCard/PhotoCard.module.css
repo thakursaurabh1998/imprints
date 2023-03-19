@@ -1,0 +1,15 @@
+.collection-card {
+  background-color: #161819;
+}
+
+.collection-title {
+  color: #d7d7d7;
+  font-weight: 600;
+  letter-spacing: 0.035em;
+}
+
+.collection-description {
+  color: #a0a0a1;
+  font-weight: 100;
+  letter-spacing: 0.025em;
+}
