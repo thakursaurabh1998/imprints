@@ -1,12 +1,13 @@
-import { Button } from "@mui/material";
 import Modal from "@mui/material/Modal";
+
+import CloseButton from "../CloseButton";
 import PhotoCarousel from "../PhotoCarousel";
 
 interface CarouselModalProps {
   show: boolean;
-  handleClose: () => void;
   images: string[];
   openedImage: number;
+  handleClose: () => void;
 }
 
 export default function CarouselModal({
@@ -18,7 +19,7 @@ export default function CarouselModal({
   return (
     <Modal open={show} onClose={handleClose}>
       <>
-        <Button onClick={() => handleClose()}>Close</Button>
+        <CloseButton onClick={() => handleClose()} />
         <PhotoCarousel pictures={images} openedImage={openedImage} />
       </>
     </Modal>

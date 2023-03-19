@@ -1,0 +1,9 @@
+.close-button {
+    position: absolute;
+    top: 2vh;
+    right: 2vw;
+    z-index: 10000;
+    cursor: pointer;
+    border-radius: 50px;
+    background-color: rgba(127, 127, 127, 0.648);
+}
