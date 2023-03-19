@@ -21,8 +21,8 @@ export default function Header({ openDrawer }: HeaderProps) {
           <span id={styles.title}>
             <Link href="/" underline="none">
               <strong>{config.header.title.toUpperCase()}</strong>&nbsp;
+              {config.header.subtitle.toUpperCase()}
             </Link>
-            {config.header.subtitle.toUpperCase()}
           </span>
         </Grid>
         <Grid item xs={2}>

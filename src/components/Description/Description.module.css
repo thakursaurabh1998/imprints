@@ -6,12 +6,11 @@
 }
 
 .panel {
-  padding: 4em 4em 2em 4em;
+  padding: 3em 4em 4em 4em;
   background: #202224fa;
-  max-height: calc(80vh - 4em);
+  max-height: calc(80vh - 3em);
   z-index: 10001;
   bottom: 56px;
-  /* margin-bottom: 56px; */
 }
 
 .panel-title {
@@ -49,7 +48,7 @@
   }
 
   .panel {
-    padding: 4em 2em 2em 2em;
+    padding: 3em 2em 3em 2em;
   }
 }
 

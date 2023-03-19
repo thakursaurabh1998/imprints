@@ -10,8 +10,9 @@ const config = {
   footer: {
     name: "Hey there, my name is Saurabh",
     bio: "I like to click pictures of moments or things that I always want to keep with me forever and this is a place where I would like to share them with the world. There is a ton of beauty around us and this is my way to share it with the world.",
-    github:
-      "Forked from: <a target='_blank' rel='noreferrer' href='https://github.com/rampatra/photography'>Ram Patra's Photography</a> project",
+  },
+  social: {
+    github: "https://github.com/thakursaurabh1998",
   },
 };
 
