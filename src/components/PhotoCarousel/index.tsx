@@ -1,6 +1,7 @@
 import { Grid } from "@mui/material";
+import { useEffect, useRef } from "react";
 import { Keyboard, Navigation } from "swiper";
-import { Swiper, SwiperSlide } from "swiper/react";
+import { Swiper, SwiperRef, SwiperSlide } from "swiper/react";
 
 import "swiper/css";
 import "swiper/css/navigation";
@@ -11,12 +12,23 @@ import styles from "./PhotoCarousel.module.css";
 interface PhotoCarouselProps {
   pictures: string[];
   openedImage: number;
+  slug: string;
 }
 
 export default function PhotoCarousel({
+  slug,
   pictures,
   openedImage,
 }: PhotoCarouselProps) {
+  const swiperRef = useRef<SwiperRef>(null);
+
+  const goToSlide = (slideIndex: number) => {
+    swiperRef.current?.swiper.slideTo(slideIndex);
+  };
+
+  useEffect(() => {
+    goToSlide(openedImage);
+  }, [openedImage]);
   return (
     <Grid
       container
@@ -27,6 +39,7 @@ export default function PhotoCarousel({
       minWidth="100vw"
     >
       <Swiper
+        ref={swiperRef}
         autoHeight
         navigation
         centeredSlides
@@ -49,7 +62,7 @@ export default function PhotoCarousel({
             >
               <img
                 loading="lazy"
-                src={"/images/full" + picture}
+                src={`/images/full/${slug}/${picture}`}
                 alt={picture}
                 className={styles.picture}
               />
