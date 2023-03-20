@@ -13,8 +13,8 @@ export default function Spiti() {
 
   const { collection } = router.query;
   const collectionObject = config.collections.find(
-    (abc) => abc.slug === "/" + collection
-  ) ?? { pictures: [], title: "", description: "" };
+    (abc) => abc.slug === collection
+  ) ?? { pictures: [], title: "", description: "", slug: "" };
 
   function handleClickOnImage(index: number) {
     setClickedImage(index);
@@ -30,6 +30,7 @@ export default function Spiti() {
         <meta name="description" content={collectionObject.description} />
       </Head>
       <CarouselModal
+        slug={collectionObject.slug}
         show={showCarousel}
         images={collectionObject.pictures}
         openedImage={clickedImage}
@@ -39,7 +40,7 @@ export default function Spiti() {
         {collectionObject.pictures.map((image, index) => (
           <img
             key={image}
-            src={"/images/thumbs" + image}
+            src={`/images/thumbs/${collectionObject.slug}/${image}`}
             alt={image}
             onClick={() => handleClickOnImage(index)}
           />
