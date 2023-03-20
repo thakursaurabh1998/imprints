@@ -25,6 +25,7 @@ export default function PhotoCard({
   return (
     <Card
       onClick={() => router.push(slug)}
+      style={{ backgroundColor: "#161819" }}
       className={styles["collection-card"]}
     >
       <CardActionArea>
@@ -35,6 +36,11 @@ export default function PhotoCard({
             className={styles["collection-title"]}
             fontFamily="Source Sans Pro"
             gutterBottom
+            style={{
+              color: "#d7d7d7",
+              fontWeight: 600,
+              letterSpacing: "0.035em",
+            }}
           >
             {title.toUpperCase()}
           </Typography>
@@ -43,6 +49,11 @@ export default function PhotoCard({
             color="text.secondary"
             fontFamily="Source Sans Pro"
             className={styles["collection-description"]}
+            style={{
+              color: "#a0a0a1",
+              fontWeight: 100,
+              letterSpacing: "0.025em",
+            }}
           >
             {description}
           </Typography>
