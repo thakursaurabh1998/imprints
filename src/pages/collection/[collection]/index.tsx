@@ -1,9 +1,10 @@
 import Head from "next/head";
 import { useState } from "react";
 
+import config from "@/config";
+import MetaTags from "@/components/Meta";
 import PhotoGrid from "@/components/PhotoGrid";
 import CarouselModal from "@/components/CarouselModal";
-import config from "@/config";
 
 interface CollectionMeta {
   pictures: string[];
@@ -63,9 +64,15 @@ export default function PhotoCollection({
   return (
     <>
       <Head>
-        <title>{`${collectionObject.title ?? ""} | ${config.title}`}</title>
+        <title>{`${collectionObject.title} | ${config.title}`}</title>
         <meta name="description" content={collectionObject.description} />
       </Head>
+      <MetaTags
+        title={collectionObject.title}
+        description={collectionObject.description}
+        slug={collectionObject.slug}
+        cover={`${config.baseUrl}/images/thumbs/${collectionObject.slug}/${collectionObject.cover}`}
+      />
       <CarouselModal
         slug={collectionObject.slug}
         show={showCarousel}

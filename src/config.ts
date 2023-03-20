@@ -3,6 +3,7 @@ const config = {
   image_fulls_loc: "/images/fulls",
   image_thumbs_loc: "/images/thumbs",
   google_tag: "G-VNMJYBCT8F",
+  baseUrl: "https://imprints.saurabhthakur.dev",
 
   title: "Imprints by Saurabh Thakur",
   subtitle: "A display of pictures that I captured",
@@ -13,6 +14,7 @@ const config = {
   },
   social: {
     github: "https://github.com/thakursaurabh1998",
+    twitter: "thakursaurabh98"
   },
 
   collections: [
