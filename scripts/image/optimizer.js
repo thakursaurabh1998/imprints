@@ -15,6 +15,7 @@ function compressImages(dir, size) {
   return Promise.all(
     imagePaths.map(async (path) => {
       const optimizedImageBuffer = await sharp(path)
+        .rotate()
         .resize({ width: size })
         .toBuffer();
       const newPathArr = path.split("/");
