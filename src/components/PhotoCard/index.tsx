@@ -24,7 +24,7 @@ export default function PhotoCard({
 
   return (
     <Card
-      onClick={() => router.push(slug)}
+      onClick={() => router.push(`/collection/${slug}`)}
       style={{ backgroundColor: "#161819" }}
       className={styles["collection-card"]}
     >

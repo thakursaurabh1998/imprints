@@ -1,20 +1,59 @@
+import Head from "next/head";
 import { useState } from "react";
-import { useRouter } from "next/router";
 
 import PhotoGrid from "@/components/PhotoGrid";
 import CarouselModal from "@/components/CarouselModal";
 import config from "@/config";
-import Head from "next/head";
 
-export default function Spiti() {
-  const router = useRouter();
+interface CollectionMeta {
+  pictures: string[];
+  title: string;
+  description: string;
+  slug: string;
+  cover: string;
+}
+
+interface PhotoCollectionProps {
+  collectionObject: CollectionMeta;
+}
+
+export async function getStaticPaths() {
+  return {
+    paths: config.collections.map((collection) => ({
+      params: {
+        collection: collection.slug,
+      },
+    })),
+    fallback: false,
+  };
+}
+
+export async function getStaticProps({
+  params,
+}: {
+  params: {
+    collection: string;
+  };
+}) {
+  const collectionMeta = config.collections.find(
+    (collection) => collection.slug === params.collection
+  );
+
+  return {
+    props: {
+      collectionObject: {
+        collection: params.collection,
+        ...collectionMeta,
+      },
+    },
+  };
+}
+
+export default function PhotoCollection({
+  collectionObject,
+}: PhotoCollectionProps) {
   const [showCarousel, setShowCarousel] = useState(false);
   const [clickedImage, setClickedImage] = useState(0);
-
-  const { collection } = router.query;
-  const collectionObject = config.collections.find(
-    (abc) => abc.slug === collection
-  ) ?? { pictures: [], title: "", description: "", slug: "" };
 
   function handleClickOnImage(index: number) {
     setClickedImage(index);
@@ -24,9 +63,7 @@ export default function Spiti() {
   return (
     <>
       <Head>
-        <title>
-          {collectionObject.title} | {config.title}
-        </title>
+        <title>{`${collectionObject.title ?? ""} | ${config.title}`}</title>
         <meta name="description" content={collectionObject.description} />
       </Head>
       <CarouselModal
