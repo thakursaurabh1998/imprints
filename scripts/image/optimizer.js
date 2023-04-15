@@ -10,6 +10,17 @@ async function createDirectory(directoryPath) {
   }
 }
 
+function createNewPath(path, dir) {
+  const newPathArr = path.split("/");
+  // remove original from the path
+  newPathArr.splice(1, 1);
+  // add name of the collection
+  newPathArr.splice(2, 0, dir);
+  const newPath = newPathArr.join("/");
+
+  return newPath;
+}
+
 function compressImages(dir, size) {
   const imagePaths = glob.sync("public/original/images/**/*.{jpg,jpeg,png}");
   return Promise.all(
@@ -18,11 +29,8 @@ function compressImages(dir, size) {
         .rotate()
         .resize({ width: size })
         .toBuffer();
-      const newPathArr = path.split("/");
-      newPathArr.splice(1, 1);
-      newPathArr.splice(2, 0, dir);
-      const newPath = newPathArr.join("/");
 
+      const newPath = createNewPath(path, dir);
       await createDirectory(newPath);
 
       await sharp(optimizedImageBuffer)
@@ -38,4 +46,5 @@ async function execute(params) {
   await compressImages("full", 2048);
   console.log("All images optimized!");
 }
+
 module.exports = execute;
