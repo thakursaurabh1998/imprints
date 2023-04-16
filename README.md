@@ -9,6 +9,14 @@ I like to click pictures of moments or things that I always want to keep with me
 
 [![Netlify](https://www.netlify.com/img/global/badges/netlify-color-accent.svg)](https://app.netlify.com/sites/thakursaurabh1998)
 
-[![Netlify Status](https://api.netlify.com/api/v1/badges/6f947a38-820c-403b-a1a8-7d43c6bfa366/deploy-status)](https://app.netlify.com/sites/thakursaurabh1998/deploys)
+[![Netlify Status](https://api.netlify.com/api/v1/badges/94466c2f-4a77-4077-8568-b88efe1efbb4/deploy-status)](https://app.netlify.com/sites/imprints-saurabhthakur/deploys)
 
 Commits to master and PRs are automatically built and deployed by Netlify
+
+## Setup
+
+### Add pre-commit scripts
+
+You can add pre-commit scripts easily by adding them under the scripts directory. Currently there is one script present which optimizes the image before committing them. You need to follow the similar directory structure.
+
+> Scripts are currently supported only in Javascript.
