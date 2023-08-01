@@ -1,54 +1,15 @@
-import Head from "next/head";
-import { useState } from "react";
+import Head from 'next/head';
+import { useState } from 'react';
 
-import config from "@/config";
-import MetaTags from "@/components/Meta";
-import PhotoGrid from "@/components/PhotoGrid";
-import CarouselModal from "@/components/CarouselModal";
+import CarouselModal from '@/components/CarouselModal';
+import MetaTags from '@/components/Meta';
+import PhotoGrid from '@/components/PhotoGrid';
+import config from '@/config';
+import { Collection } from '@/utils/generate-collection-config';
 
-interface CollectionMeta {
-  pictures: string[];
-  title: string;
-  description: string;
-  slug: string;
-  cover: string;
-}
-
-interface PhotoCollectionProps {
-  collectionObject: CollectionMeta;
-}
-
-export async function getStaticPaths() {
-  return {
-    paths: config.collections.map((collection) => ({
-      params: {
-        collection: collection.slug,
-      },
-    })),
-    fallback: false,
-  };
-}
-
-export async function getStaticProps({
-  params,
-}: {
-  params: {
-    collection: string;
-  };
-}) {
-  const collectionMeta = config.collections.find(
-    (collection) => collection.slug === params.collection
-  );
-
-  return {
-    props: {
-      collectionObject: {
-        collection: params.collection,
-        ...collectionMeta,
-      },
-    },
-  };
-}
+type PhotoCollectionProps = {
+  collectionObject: Collection;
+};
 
 export default function PhotoCollection({
   collectionObject,
@@ -92,4 +53,36 @@ export default function PhotoCollection({
       </PhotoGrid>
     </>
   );
+}
+
+export async function getStaticPaths() {
+  return {
+    paths: config.collections.map((collection) => ({
+      params: {
+        collection: collection.slug,
+      },
+    })),
+    fallback: false,
+  };
+}
+
+export async function getStaticProps({
+  params,
+}: {
+  params: {
+    collection: string;
+  };
+}) {
+  const collectionMeta = config.collections.find(
+    (collection) => collection.slug === params.collection,
+  );
+
+  return {
+    props: {
+      collectionObject: {
+        collection: params.collection,
+        ...collectionMeta,
+      },
+    },
+  };
 }
