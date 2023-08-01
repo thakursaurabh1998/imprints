@@ -6,8 +6,6 @@ import SwipeableDrawer from "@mui/material/SwipeableDrawer";
 import Header from "../Header";
 import Description from "../Description";
 
-const drawerBleeding = 56;
-
 export default function HeaderDrawer() {
   const [open, setOpen] = useState(false);
 
