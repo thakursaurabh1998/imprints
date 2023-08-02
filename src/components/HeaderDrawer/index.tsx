@@ -1,10 +1,12 @@
-import { useState } from "react";
-import { Paper } from "@mui/material";
-import { Global } from "@emotion/react";
-import SwipeableDrawer from "@mui/material/SwipeableDrawer";
+'use client';
 
-import Header from "../Header";
-import Description from "../Description";
+import { Global } from '@emotion/react';
+import { Paper } from '@mui/material';
+import SwipeableDrawer from '@mui/material/SwipeableDrawer';
+import { useState } from 'react';
+
+import Description from '../Description';
+import Header from '../Header';
 
 export default function HeaderDrawer() {
   const [open, setOpen] = useState(false);
@@ -17,15 +19,15 @@ export default function HeaderDrawer() {
     <>
       <Paper
         elevation={4}
-        sx={{ position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 9 }}
+        sx={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 9 }}
       >
         <Header openDrawer={toggleDrawer(true)} />
       </Paper>
       <Global
         styles={{
-          ".MuiDrawer-root > .MuiPaper-root": {
-            maxHeight: "50%",
-            overflow: "scroll",
+          '.MuiDrawer-root > .MuiPaper-root': {
+            maxHeight: '50%',
+            overflow: 'scroll',
           },
         }}
       />

@@ -1,32 +1,24 @@
-import Modal from "@mui/material/Modal";
+'use client';
 
-import CloseButton from "../CloseButton";
-import PhotoCarousel from "../PhotoCarousel";
+import Modal from '@mui/material/Modal';
+import { useState } from 'react';
+
+import CloseButton from '../CloseButton';
+import PhotoCarousel from '../PhotoCarousel';
 
 interface CarouselModalProps {
-  show: boolean;
   images: string[];
   slug: string;
-  openedImage: number;
-  handleClose: () => void;
 }
 
-export default function CarouselModal({
-  show,
-  images,
-  slug,
-  handleClose,
-  openedImage,
-}: CarouselModalProps) {
+export default function CarouselModal({ images, slug }: CarouselModalProps) {
+  const [showCarousel, setShowCarousel] = useState(false);
+
   return (
-    <Modal open={show} onClose={handleClose}>
+    <Modal open={showCarousel} onClose={() => setShowCarousel(false)}>
       <>
-        <CloseButton onClick={handleClose} />
-        <PhotoCarousel
-          slug={slug}
-          pictures={images}
-          openedImage={openedImage}
-        />
+        <CloseButton onClick={() => setShowCarousel(false)} />
+        <PhotoCarousel slug={slug} pictures={images} openedImage={0} />
       </>
     </Modal>
   );

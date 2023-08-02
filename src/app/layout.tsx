@@ -1,13 +1,17 @@
-import Script from "next/script";
-import type { AppProps } from "next/app";
+import Script from 'next/script';
+import React from 'react';
 
-import config from "@/config";
-import Layout from "@/components/Layout";
-import "@/styles/globals.css";
+import Layout from '@/components/Layout';
+import config from '@/config';
+import '@/styles/globals.css';
 
-export default function App({ Component, pageProps }: AppProps) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
-    <>
+    <html lang="en">
       <Script
         src={`https://www.googletagmanager.com/gtag/js?id=${config.google_tag}`}
         strategy="afterInteractive"
@@ -21,9 +25,9 @@ export default function App({ Component, pageProps }: AppProps) {
           gtag('config', '${config.google_tag}');
         `}
       </Script>
-      <Layout>
-        <Component {...pageProps} />
-      </Layout>
-    </>
+      <body>
+        <Layout>{children}</Layout>
+      </body>
+    </html>
   );
 }
