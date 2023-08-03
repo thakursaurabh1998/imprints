@@ -23,3 +23,7 @@ textarea {
   font-weight: 300;
   letter-spacing: 0.025em;
 }
+
+.app-body {
+  padding-bottom: 61px;
+}

@@ -1,7 +1,7 @@
 import Script from 'next/script';
 import React from 'react';
 
-import Layout from '@/components/Layout';
+import HeaderDrawer from '@/components/HeaderDrawer';
 import config from '@/config';
 import '@/styles/globals.css';
 
@@ -26,7 +26,8 @@ export default function RootLayout({
         `}
       </Script>
       <body>
-        <Layout>{children}</Layout>
+        <HeaderDrawer />
+        <main className="app-body">{children}</main>
       </body>
     </html>
   );
