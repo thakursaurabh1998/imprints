@@ -1,31 +1,46 @@
 'use client';
 
-import { Box, Card, CardContent, CardMedia, Typography } from '@mui/material';
-import { useRouter } from 'next/navigation';
+import {
+  Box,
+  Button,
+  Card,
+  CardActions,
+  CardContent,
+  CardMedia,
+  Chip,
+  Typography,
+} from '@mui/material';
 
 import { Collection } from '@/utils/generate-collection-config';
 
 export default function AdminCard({ collection }: { collection: Collection }) {
-  const router = useRouter();
-
   return (
-    <Card
-      sx={{ display: 'flex' }}
-      style={{ margin: 20, cursor: 'pointer' }}
-      onClick={() => router.push(`/admin/collection/${collection.slug}`)}
-    >
+    <Card sx={{ display: 'flex' }} style={{ height: '100%' }}>
       <Box sx={{ display: 'flex', flexDirection: 'column' }}>
         <CardContent sx={{ flex: '1 0 auto' }}>
           <Typography gutterBottom variant="h5" component="h2">
             {collection.title}
+
+            <Chip
+              style={{ marginBottom: 5, marginLeft: 20 }}
+              label={<code>/{collection.slug}</code>}
+            />
           </Typography>
-          <Typography gutterBottom component="p">
-            slug: {collection.slug}
-          </Typography>
+
           <Typography variant="body2" color="text.secondary" component="p">
             {collection.description}
           </Typography>
         </CardContent>
+        <Box sx={{ display: 'flex', alignItems: 'center', pl: 1, pb: 1 }}>
+          <CardActions>
+            <Button size="small" href={`/admin/collection/${collection.slug}`}>
+              View
+            </Button>
+            <Button variant="contained" size="small">
+              Edit
+            </Button>
+          </CardActions>
+        </Box>
       </Box>
       <CardMedia
         component="img"

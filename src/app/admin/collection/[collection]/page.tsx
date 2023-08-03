@@ -1,9 +1,9 @@
-import Image from 'next/image';
+import { notFound } from 'next/navigation';
 
+import SortableImageGrid from '@/components/SortableImageGrid';
 import { getCollectionMeta } from '@/utils/collection-meta';
 import { getCollectionsStaticPaths } from '@/utils/collections-static-paths';
 import { isProduction } from '@/utils/is-production-environment';
-import { notFound } from 'next/navigation';
 
 export default function CollectionSet({
   params: { collection },
@@ -14,19 +14,11 @@ export default function CollectionSet({
     notFound();
   }
 
-  return (
-    <div>
-      {getCollectionMeta(collection)?.pictures.map((picture: string) => (
-        <Image
-          height={200}
-          width={200}
-          key={picture}
-          src={`/original/images/${collection}/${picture}`}
-          alt="display"
-        />
-      ))}
-    </div>
-  );
+  const collectionMeta = getCollectionMeta(collection);
+
+  if (!collectionMeta) return null;
+
+  return <SortableImageGrid collection={collectionMeta} />;
 }
 
 export function generateStaticParams() {
