@@ -1,6 +1,5 @@
 'use client';
 
-import { Collection } from '@/utils/generate-collection-config';
 import {
   closestCenter,
   DndContext,
@@ -17,13 +16,21 @@ import {
 } from '@dnd-kit/sortable';
 import { Grid } from '@mui/material';
 import Image from 'next/image';
+
 import { SortableItem } from './SortableItem';
 
 type SortableGridProps = {
-  collection: Collection;
+  pictures: string[];
+  slug: string;
+  // eslint-disable-next-line no-unused-vars
+  onChange?: (updatedPictures: string[]) => void;
 };
 
-export default function SortableImageGrid({ collection }: SortableGridProps) {
+export default function SortableImageGrid({
+  pictures,
+  slug,
+  onChange,
+}: SortableGridProps) {
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
@@ -35,9 +42,10 @@ export default function SortableImageGrid({ collection }: SortableGridProps) {
     const { active, over } = event;
 
     if (active.id !== over?.id) {
-      const oldIndex = collection.pictures.indexOf(active.id as string);
-      const newIndex = collection.pictures.indexOf(over?.id as string);
-      console.log(arrayMove(collection.pictures, oldIndex, newIndex));
+      const oldIndex = pictures.indexOf(active.id as string);
+      const newIndex = pictures.indexOf(over?.id as string);
+
+      onChange?.(arrayMove(pictures, oldIndex, newIndex));
     }
   }
 
@@ -47,16 +55,17 @@ export default function SortableImageGrid({ collection }: SortableGridProps) {
       collisionDetection={closestCenter}
       onDragEnd={handleDragEnd}
     >
-      <SortableContext items={collection.pictures}>
+      <SortableContext items={pictures}>
         <Grid container>
-          {collection.pictures.map((picture) => (
+          {pictures.map((picture) => (
             <SortableItem key={picture} id={picture}>
               <Grid item>
                 <Image
                   height={200}
                   width={200}
+                  quality={20}
                   key={picture}
-                  src={`/original/images/${collection.slug}/${picture}`}
+                  src={`/original/images/${slug}/${picture}`}
                   alt="display"
                 />
               </Grid>

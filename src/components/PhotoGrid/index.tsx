@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 
-import { Collection } from '@/utils/generate-collection-config';
+import { Collection } from '@/utils/collection-config';
 import CarouselModal from '../CarouselModal';
 import styles from './PhotoGrid.module.css';
 

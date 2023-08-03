@@ -1,24 +1,29 @@
 import { notFound } from 'next/navigation';
 
 import SortableImageGrid from '@/components/SortableImageGrid';
-import { getCollectionMeta } from '@/utils/collection-meta';
+import { getCollectionMetaById } from '@/utils/collection-meta';
 import { getCollectionsStaticPaths } from '@/utils/collections-static-paths';
 import { isProduction } from '@/utils/is-production-environment';
 
 export default function CollectionSet({
-  params: { collection },
+  params: { collectionId },
 }: {
-  params: { collection: string };
+  params: { collectionId: string };
 }) {
   if (isProduction()) {
     notFound();
   }
 
-  const collectionMeta = getCollectionMeta(collection);
+  const collectionMeta = getCollectionMetaById(collectionId);
 
-  if (!collectionMeta) return null;
+  if (!collectionMeta) return notFound();
 
-  return <SortableImageGrid collection={collectionMeta} />;
+  return (
+    <SortableImageGrid
+      pictures={collectionMeta.pictures}
+      slug={collectionMeta.slug}
+    />
+  );
 }
 
 export function generateStaticParams() {

@@ -1,5 +1,5 @@
 import collections from '../public/resource/collections.json';
-import { Collection } from './utils/generate-collection-config';
+import { Collection } from './utils/collection-config';
 
 const config = {
   author: 'Saurabh Thakur',

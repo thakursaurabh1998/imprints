@@ -11,7 +11,7 @@ import {
   Typography,
 } from '@mui/material';
 
-import { Collection } from '@/utils/generate-collection-config';
+import { Collection } from '@/utils/collection-config';
 
 export default function AdminCard({ collection }: { collection: Collection }) {
   return (
@@ -33,10 +33,14 @@ export default function AdminCard({ collection }: { collection: Collection }) {
         </CardContent>
         <Box sx={{ display: 'flex', alignItems: 'center', pl: 1, pb: 1 }}>
           <CardActions>
-            <Button size="small" href={`/admin/collection/${collection.slug}`}>
+            <Button size="small" href={`/admin/collection/${collection.id}`}>
               View
             </Button>
-            <Button variant="contained" size="small">
+            <Button
+              variant="contained"
+              size="small"
+              href={`/admin/collection/${collection.id}/edit`}
+            >
               Edit
             </Button>
           </CardActions>
