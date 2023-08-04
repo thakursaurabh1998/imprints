@@ -1,4 +1,5 @@
 import fs from 'fs/promises';
+import { ORIGINAL_IMAGE_DIRECTORY } from './constants';
 
 const EXCLUDED_FILES = ['.DS_Store'];
 
@@ -19,4 +20,14 @@ export function writeJSONFile(filePath: string, data: any) {
 
 export function renameDirectory(oldPath: string, newPath: string) {
   return fs.rename(oldPath, newPath);
+}
+
+export function writeOriginalImage({
+  filePath,
+  buffer,
+}: {
+  filePath: string;
+  buffer: Buffer;
+}) {
+  return fs.writeFile(`${ORIGINAL_IMAGE_DIRECTORY}/${filePath}`, buffer);
 }

@@ -4,8 +4,8 @@ import { Grid, Typography } from '@mui/material';
 import { notFound } from 'next/navigation';
 import useSWRMutation from 'swr/mutation';
 
-import config from '@/config';
 import { Collection } from '@/utils/collection-config';
+import { getCollectionMetaById } from '@/utils/collection-meta';
 import { hideInProduction } from '@/utils/hide-in-production';
 import CollectionForm from '../../../../../components/CollectionForm';
 
@@ -16,9 +16,7 @@ export default function CollectionSet({
 }) {
   hideInProduction();
 
-  const collectionObject = config.collections.find(
-    (x) => x.id === collectionId,
-  );
+  const collectionObject = getCollectionMetaById(collectionId);
 
   if (!collectionObject) {
     notFound();

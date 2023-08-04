@@ -1,22 +1,38 @@
 import { Button, Grid, Paper, TextField } from '@mui/material';
 import { useFormik } from 'formik';
 import Image from 'next/image';
+import { useState } from 'react';
 
-import SortableImageGrid from '@/components/SortableImageGrid';
+import SortableGrid from '@/components/SortableGrid';
 import { Collection } from '@/utils/collection-config';
+import UploadDrawer from '../UploadDrawer';
 
 export default function CollectionForm({
+  createMode = false,
   collection,
   onSubmit,
 }: {
+  createMode?: boolean;
   collection: Collection;
   // eslint-disable-next-line no-unused-vars
   onSubmit: (collection: Collection) => void;
 }) {
+  const [uploadModalOpen, setUploadModalOpen] = useState(false);
+  const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
+
   const collectionForm = useFormik({
     initialValues: collection,
     onSubmit,
   });
+
+  function getPictureSource(picture: string) {
+    if (createMode) {
+      const imageFile = uploadedFiles.find((x) => x.name === picture)!;
+      return URL.createObjectURL(imageFile);
+    }
+
+    return `/original/images/${collection.slug}/${picture}`;
+  }
 
   return (
     <form onSubmit={collectionForm.handleSubmit}>
@@ -64,7 +80,33 @@ export default function CollectionForm({
             />
           </Grid>
           <Grid item xs={12}>
-            <SortableImageGrid
+            <Grid container paddingBottom={1}>
+              <Grid item xs={1} margin="auto">
+                <h3>Pictures</h3>
+              </Grid>
+              <Grid item xs={11}>
+                <UploadDrawer
+                  collectionId={collection.id}
+                  show={uploadModalOpen}
+                  handleClose={(uploadedImages) => {
+                    if (!createMode) {
+                      window.location.reload();
+                    }
+                    if (uploadedImages) {
+                      setUploadedFiles(uploadedImages);
+                    }
+                    setUploadModalOpen(false);
+                  }}
+                />
+                <Button
+                  variant="outlined"
+                  onClick={() => setUploadModalOpen(true)}
+                >
+                  Upload
+                </Button>
+              </Grid>
+            </Grid>
+            <SortableGrid
               items={collectionForm.values.pictures.map((picture) => ({
                 id: picture,
                 itemNode: (
@@ -73,7 +115,7 @@ export default function CollectionForm({
                     width={200}
                     quality={20}
                     key={picture}
-                    src={`/original/images/${collection.slug}/${picture}`}
+                    src={getPictureSource(picture)}
                     alt={picture}
                   />
                 ),
