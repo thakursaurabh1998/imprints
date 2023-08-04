@@ -1,5 +1,6 @@
 import { Button, Grid, Paper, TextField } from '@mui/material';
 import { useFormik } from 'formik';
+import Image from 'next/image';
 
 import SortableImageGrid from '@/components/SortableImageGrid';
 import { Collection } from '@/utils/collection-config';
@@ -64,10 +65,24 @@ export default function CollectionForm({
           </Grid>
           <Grid item xs={12}>
             <SortableImageGrid
-              pictures={collectionForm.values.pictures}
-              slug={collection.slug}
-              onChange={(pictures) =>
-                collectionForm.setFieldValue('pictures', pictures)
+              items={collectionForm.values.pictures.map((picture) => ({
+                id: picture,
+                itemNode: (
+                  <Image
+                    height={200}
+                    width={200}
+                    quality={20}
+                    key={picture}
+                    src={`/original/images/${collection.slug}/${picture}`}
+                    alt={picture}
+                  />
+                ),
+              }))}
+              onChange={(items) =>
+                collectionForm.setFieldValue(
+                  'pictures',
+                  items.map((item) => item.id),
+                )
               }
             />
           </Grid>
