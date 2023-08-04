@@ -15,19 +15,23 @@ export default function CollectionForm({
   createMode?: boolean;
   collection: Collection;
   // eslint-disable-next-line no-unused-vars
-  onSubmit: (collection: Collection) => void;
+  onSubmit: (collection: Collection, uploadedFiles: File[]) => void;
 }) {
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
 
   const collectionForm = useFormik({
     initialValues: collection,
-    onSubmit,
+    onSubmit: (finalCollectionData) =>
+      onSubmit(finalCollectionData, uploadedFiles),
   });
 
   function getPictureSource(picture: string) {
     if (createMode) {
-      const imageFile = uploadedFiles.find((x) => x.name === picture)!;
+      const imageFile = uploadedFiles.find((x) => x.name === picture);
+
+      if (!imageFile) return '';
+
       return URL.createObjectURL(imageFile);
     }
 
@@ -86,15 +90,24 @@ export default function CollectionForm({
               </Grid>
               <Grid item xs={11}>
                 <UploadDrawer
+                  createMode={createMode}
                   collectionId={collection.id}
                   show={uploadModalOpen}
                   handleClose={(uploadedImages) => {
-                    if (!createMode) {
-                      window.location.reload();
-                    }
-                    if (uploadedImages) {
+                    if (createMode) {
                       setUploadedFiles(uploadedImages);
                     }
+
+                    const deduplicatedPictures = getDeduplicatedPictures(
+                      collectionForm.values.pictures,
+                      uploadedImages.map((x) => x.name),
+                    );
+
+                    collectionForm.setFieldValue(
+                      'pictures',
+                      deduplicatedPictures,
+                    );
+
                     setUploadModalOpen(false);
                   }}
                 />
@@ -128,14 +141,34 @@ export default function CollectionForm({
               }
             />
           </Grid>
-          {/* add more fields here */}
           <Grid item xs={12}>
             <Button variant="contained" color="primary" type="submit">
-              Update
+              {createMode ? 'Create' : 'Update'}
             </Button>
           </Grid>
         </Grid>
       </Paper>
     </form>
   );
+}
+
+function getDeduplicatedPictures(
+  pictures: string[],
+  uploadedPictures: string[],
+) {
+  const newPictures = [...pictures];
+  let duplicateFound = false;
+
+  for (const up of uploadedPictures) {
+    if (pictures.includes(up)) {
+      duplicateFound = true;
+      continue;
+    }
+    newPictures.push(up);
+  }
+  if (duplicateFound) {
+    alert('Duplicate named pictures found');
+  }
+
+  return newPictures;
 }

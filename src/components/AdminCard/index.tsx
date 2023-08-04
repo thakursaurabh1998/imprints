@@ -1,5 +1,3 @@
-'use client';
-
 import {
   Box,
   Button,
@@ -39,7 +37,7 @@ export default function AdminCard({ collection }: { collection: Collection }) {
             <Button
               variant="contained"
               size="small"
-              href={`/admin/collection/${collection.id}/edit`}
+              href={`/admin/collections/${collection.id}/edit`}
             >
               Edit
             </Button>
@@ -48,7 +46,7 @@ export default function AdminCard({ collection }: { collection: Collection }) {
       </Box>
       <CardMedia
         component="img"
-        sx={{ width: 151 }}
+        sx={{ width: 200 }}
         image={`/original/images/${collection.slug}/${collection.cover}`}
         alt={`Cover image for ${collection.title}`}
       />

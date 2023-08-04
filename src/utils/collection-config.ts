@@ -35,6 +35,12 @@ export async function updateCollectionsAndWriteToJson(
   await writeJSONFile(COLLECTION_JSON_FILE_PATH, updatedCollections);
 }
 
+export async function addCollectionAndWriteToJson(collection: Collection) {
+  const collections = await getCollections();
+  collections.unshift(collection);
+  await writeJSONFile(COLLECTION_JSON_FILE_PATH, collections);
+}
+
 export async function renameDirectoriesUsingSlug(
   oldSlug: string,
   newSlug: string,

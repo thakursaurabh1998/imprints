@@ -1,16 +1,19 @@
+import { uploadImage } from '@/utils/upload-image';
 import { Button, CircularProgress, Drawer, Grid } from '@mui/material';
 import { useRef, useState } from 'react';
 import useSWRMutation from 'swr/mutation';
 
 export default function UploadDrawer({
   show,
+  createMode = false,
   collectionId,
   handleClose,
 }: {
   show: boolean;
+  createMode?: boolean;
   collectionId: string | null;
   // eslint-disable-next-line no-unused-vars
-  handleClose: (uploadedImages?: File[]) => void;
+  handleClose: (uploadedImages: File[]) => void;
 }) {
   const [loading, setLoading] = useState(false);
 
@@ -25,7 +28,7 @@ export default function UploadDrawer({
       role="presentation"
       anchor="bottom"
       open={show}
-      onClose={() => handleClose()}
+      onClose={() => handleClose([])}
     >
       <Grid
         container
@@ -53,37 +56,19 @@ export default function UploadDrawer({
           ref={fileInputRef}
           onChange={async (e) => {
             setLoading(true);
-
             const files = Object.values(e.target.files ?? {});
 
-            const pictures: string[] = [];
-
-            for (const file of files) {
-              pictures.push(file.name);
-            }
-
-            if (collectionId) {
+            if (!createMode) {
               for (const file of files) {
                 await trigger(file);
               }
-              handleClose();
-            } else {
-              handleClose(Object.values(files));
             }
+
+            handleClose(files);
+            setLoading(false);
           }}
         />
       </Grid>
     </Drawer>
   );
-}
-
-function uploadImage(url: string, { arg: imageFile }: { arg: File }) {
-  const formData = new FormData();
-
-  formData.append('file', imageFile);
-
-  return fetch(url, {
-    method: 'POST',
-    body: formData,
-  });
 }

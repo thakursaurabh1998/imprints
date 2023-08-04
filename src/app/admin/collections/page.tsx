@@ -1,6 +1,6 @@
 'use client';
 
-import { Grid } from '@mui/material';
+import { Button, Grid } from '@mui/material';
 
 import AdminCard from '@/components/AdminCard';
 import config from '@/config';
@@ -11,7 +11,22 @@ export default function AdminPanel() {
 
   return (
     <div style={{ padding: 30 }}>
-      <h1>Collections</h1>
+      <Grid container spacing={2}>
+        <Grid item xs={6}>
+          <h1>Collections</h1>
+        </Grid>
+        <Grid item xs={6} width="100%">
+          <Grid container justifyContent="flex-end">
+            <Button
+              variant="contained"
+              color="primary"
+              href="/admin/collections/new"
+            >
+              NEW COLLECTION
+            </Button>
+          </Grid>
+        </Grid>
+      </Grid>
 
       <Grid paddingTop={5} container spacing={2} rowSpacing={2}>
         {config.collections.map((collection) => (
