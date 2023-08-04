@@ -1,16 +1,13 @@
 'use client';
 
-import { notFound } from 'next/navigation';
+import { Grid } from '@mui/material';
 
 import AdminCard from '@/components/AdminCard';
 import config from '@/config';
-import { isProduction } from '@/utils/is-production-environment';
-import { Grid } from '@mui/material';
+import { hideInProduction } from '@/utils/hide-in-production';
 
 export default function AdminPanel() {
-  if (isProduction()) {
-    notFound();
-  }
+  hideInProduction();
 
   return (
     <div style={{ padding: 30 }}>

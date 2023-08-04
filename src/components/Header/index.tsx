@@ -1,6 +1,6 @@
 import { Grid, Link } from '@mui/material';
 
-import { isProduction } from '@/utils/is-production-environment';
+import { IS_PRODUCTION } from '@/utils/constants';
 import config from '../../config';
 import styles from './Header.module.css';
 
@@ -28,7 +28,7 @@ export default function Header({ openDrawer }: HeaderProps) {
         </Grid>
         <Grid item xs={2}>
           <Grid container justifyContent="end" direction="row" display="flex">
-            {!isProduction() && (
+            {!IS_PRODUCTION && (
               <span id={styles.about} style={{ marginRight: 50 }}>
                 <Link href="/admin/collections" underline="none">
                   ADMIN

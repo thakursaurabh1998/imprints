@@ -4,7 +4,7 @@ import { Grid, Typography } from '@mui/material';
 import { notFound } from 'next/navigation';
 
 import config from '@/config';
-import { isProduction } from '@/utils/is-production-environment';
+import { hideInProduction } from '@/utils/hide-in-production';
 import CollectionForm from './CollectionForm';
 
 export default function CollectionSet({
@@ -12,9 +12,7 @@ export default function CollectionSet({
 }: {
   params: { collectionId: string };
 }) {
-  if (isProduction()) {
-    notFound();
-  }
+  hideInProduction();
 
   const collectionObject = config.collections.find(
     (x) => x.id === collectionId,
