@@ -1,32 +1,27 @@
 import { Button, Grid, Paper, TextField } from '@mui/material';
 import { useFormik } from 'formik';
-import useSWRMutation from 'swr/mutation';
 
 import SortableImageGrid from '@/components/SortableImageGrid';
 import { Collection } from '@/utils/collection-config';
 
 export default function CollectionForm({
   collection,
+  onSubmit,
 }: {
   collection: Collection;
+  // eslint-disable-next-line no-unused-vars
+  onSubmit: (collection: Collection) => void;
 }) {
-  const { trigger } = useSWRMutation(
-    `/api/admin/${collection.id}`,
-    updateCollection,
-  );
-
   const collectionForm = useFormik({
     initialValues: collection,
-    onSubmit: async (updatedCollectionData) => {
-      await trigger(updatedCollectionData);
-    },
+    onSubmit,
   });
 
   return (
     <form onSubmit={collectionForm.handleSubmit}>
       <Paper sx={{ p: 2 }}>
         <Grid container spacing={2}>
-          <Grid item xs={12}>
+          <Grid item xs={6}>
             <TextField
               fullWidth
               id="title"
@@ -36,17 +31,7 @@ export default function CollectionForm({
               value={collectionForm.values.title}
             />
           </Grid>
-          <Grid item xs={12}>
-            <TextField
-              fullWidth
-              id="description"
-              name="description"
-              label="Description"
-              onChange={collectionForm.handleChange}
-              defaultValue={collectionForm.values.description}
-            />
-          </Grid>
-          <Grid item xs={12}>
+          <Grid item xs={6}>
             <TextField
               fullWidth
               id="slug"
@@ -54,6 +39,17 @@ export default function CollectionForm({
               label="Slug"
               onChange={collectionForm.handleChange}
               defaultValue={collectionForm.values.slug}
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <TextField
+              fullWidth
+              multiline
+              id="description"
+              name="description"
+              label="Description"
+              onChange={collectionForm.handleChange}
+              defaultValue={collectionForm.values.description}
             />
           </Grid>
           <Grid item xs={12}>
@@ -85,11 +81,4 @@ export default function CollectionForm({
       </Paper>
     </form>
   );
-}
-
-function updateCollection(url: string, { arg }: { arg: Collection }) {
-  return fetch(url, {
-    method: 'PUT',
-    body: JSON.stringify(arg),
-  });
 }

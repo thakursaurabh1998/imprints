@@ -33,8 +33,8 @@ export default function AdminCard({ collection }: { collection: Collection }) {
         </CardContent>
         <Box sx={{ display: 'flex', alignItems: 'center', pl: 1, pb: 1 }}>
           <CardActions>
-            <Button size="small" href={`/admin/collection/${collection.id}`}>
-              View
+            <Button size="small" href={`/collection/${collection.slug}`}>
+              Preview
             </Button>
             <Button
               variant="contained"

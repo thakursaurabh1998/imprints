@@ -2,10 +2,12 @@
 
 import { Grid, Typography } from '@mui/material';
 import { notFound } from 'next/navigation';
+import useSWRMutation from 'swr/mutation';
 
 import config from '@/config';
+import { Collection } from '@/utils/collection-config';
 import { hideInProduction } from '@/utils/hide-in-production';
-import CollectionForm from './CollectionForm';
+import CollectionForm from '../../../../../components/CollectionForm';
 
 export default function CollectionSet({
   params: { collectionId },
@@ -18,7 +20,18 @@ export default function CollectionSet({
     (x) => x.id === collectionId,
   );
 
-  if (!collectionObject) return notFound();
+  if (!collectionObject) {
+    notFound();
+  }
+
+  const { trigger } = useSWRMutation(
+    `/api/admin/${collectionId}`,
+    updateCollection,
+  );
+
+  const handleFormData = async (collectionData: Collection) => {
+    await trigger(collectionData);
+  };
 
   return (
     <Grid
@@ -32,8 +45,18 @@ export default function CollectionSet({
         <Typography variant="h2">{collectionObject?.title}</Typography>
       </Grid>
       <Grid item sm={12} md={9}>
-        <CollectionForm collection={collectionObject} />
+        <CollectionForm
+          collection={collectionObject}
+          onSubmit={handleFormData}
+        />
       </Grid>
     </Grid>
   );
+}
+
+function updateCollection(url: string, { arg }: { arg: Collection }) {
+  return fetch(url, {
+    method: 'PUT',
+    body: JSON.stringify(arg),
+  });
 }
