@@ -2,6 +2,7 @@
 
 import { Grid, Typography } from '@mui/material';
 import { notFound } from 'next/navigation';
+import { useState } from 'react';
 import useSWRMutation from 'swr/mutation';
 
 import CollectionForm from '@/components/CollectionForm';
@@ -16,6 +17,7 @@ export default function CollectionSet({
 }) {
   hideInProduction();
 
+  const [loading, setLoading] = useState(false);
   const collectionObject = getCollectionMetaById(collectionId);
 
   if (!collectionObject) {
@@ -28,7 +30,9 @@ export default function CollectionSet({
   );
 
   const handleFormData = async (collectionData: Collection) => {
+    setLoading(true);
     await trigger(collectionData);
+    setLoading(false);
   };
 
   return (
@@ -44,6 +48,7 @@ export default function CollectionSet({
       </Grid>
       <Grid item sm={12} md={9}>
         <CollectionForm
+          isLoading={loading}
           collection={collectionObject}
           onSubmit={handleFormData}
         />

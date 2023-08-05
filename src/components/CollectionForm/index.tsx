@@ -8,6 +8,8 @@ import SortableGrid from '@/components/SortableGrid';
 import UploadDrawer from '@/components/UploadDrawer';
 import { Collection } from '@/utils/collection-config';
 import { pushToUniqueList } from '@/utils/deduplicated-list';
+import { getPictureSource } from '@/utils/picture-source';
+import CoverSelectionDrawer from '../CoverSelectionDrawer';
 
 export default function CollectionForm({
   collection,
@@ -22,6 +24,7 @@ export default function CollectionForm({
   onSubmit: (collection: Collection, uploadedFiles: File[]) => void;
 }) {
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
+  const [coverPictureDrawerOpen, setCoverPictureDrawerOpen] = useState(false);
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
 
   const collectionForm = useFormik({
@@ -29,18 +32,6 @@ export default function CollectionForm({
     onSubmit: (finalCollectionData) =>
       onSubmit(finalCollectionData, uploadedFiles),
   });
-
-  function getPictureSource(picture: string) {
-    if (createMode) {
-      const imageFile = uploadedFiles.find((x) => x.name === picture);
-
-      if (!imageFile) return '';
-
-      return URL.createObjectURL(imageFile);
-    }
-
-    return `/original/images/${collection.slug}/${picture}`;
-  }
 
   function handleDrawerClose(uploadedImages: File[]) {
     if (createMode) {
@@ -93,14 +84,48 @@ export default function CollectionForm({
             />
           </Grid>
           <Grid item xs={12}>
-            <TextField
-              fullWidth
-              id="cover"
-              name="cover"
-              label="Cover"
-              onChange={collectionForm.handleChange}
-              defaultValue={collectionForm.values.cover}
-            />
+            <Grid container paddingBottom={1}>
+              <Grid item xs={1} marginY="auto">
+                <h3>Cover</h3>
+              </Grid>
+              <Grid item xs={11}>
+                <CoverSelectionDrawer
+                  slug={collection.slug}
+                  uploadedFiles={uploadedFiles}
+                  createMode={createMode}
+                  pictures={collectionForm.values.pictures}
+                  show={coverPictureDrawerOpen}
+                  onSelect={(coverPicture) => {
+                    if (coverPicture) {
+                      collectionForm.setFieldValue('cover', coverPicture);
+                    }
+                    setCoverPictureDrawerOpen(false);
+                  }}
+                />
+                <Button
+                  variant="outlined"
+                  style={{ marginLeft: 10 }}
+                  onClick={() => setCoverPictureDrawerOpen(true)}
+                >
+                  Select
+                </Button>
+              </Grid>
+            </Grid>
+            {collectionForm.values.cover && (
+              <Image
+                height={200}
+                width={200}
+                quality={20}
+                key={collectionForm.values.cover}
+                src={getPictureSource({
+                  picture: collectionForm.values.cover,
+                  createMode,
+                  uploadedFiles,
+                  slug: collection.slug,
+                })}
+                alt={collectionForm.values.cover}
+              />
+            )}
           </Grid>
           <Grid item xs={12}>
             <Grid container paddingBottom={1}>
@@ -132,7 +157,12 @@ export default function CollectionForm({
                     width={200}
                     quality={20}
                     key={picture}
-                    src={getPictureSource(picture)}
+                    src={getPictureSource({
+                      picture,
+                      createMode,
+                      uploadedFiles,
+                      slug: collection.slug,
+                    })}
                     alt={picture}
                   />
                 ),
