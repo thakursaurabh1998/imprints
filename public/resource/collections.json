@@ -1,5 +1,6 @@
 [
   {
+    "id": "e5350071-7439-49b6-9b40-43588d4eb04f",
     "title": "Mussoorie",
     "slug": "mussoorie",
     "description": "Located at the foothills of the Garhwal Himalayan range, Mussoorie offered me a stunning view at the amazing winter line. Though a very busy and tourist packed place where driving can be problematic at times. But none of the problems matter when you settle with the serenity that Mussoorie offers.",
@@ -23,6 +24,7 @@
     ]
   },
   {
+    "id": "916b048b-7e21-4f16-956f-a1d266168f63",
     "title": "Delhi",
     "slug": "delhi",
     "description": "New Delhi, the capital of India have some of the richest historical monuments that you can visit. My short trip included a visit to the India Gate, a war memorial and the Qutub Minar which was built in the 12th Century and is a part of the UNESCO world heritage sites.",
@@ -51,6 +53,7 @@
     ]
   },
   {
+    "id": "564c3c23-834b-414a-8a2d-be0962e9d911",
     "title": "Munnar",
     "slug": "munnar",
     "description": "One of the beautiful towns to visit in the Western Ghats mountain region of India, Munnar is a must to visit if you're in south India. Lush greenery of the tea plantations over the mountains makes you fall in love with the place. Addition to the nature are the cultural activities and traditional south Indian food.",
@@ -87,6 +90,7 @@
     ]
   },
   {
+    "id": "31f0db0e-6fb3-42b7-8571-48627bcb6aa2",
     "title": "Spiti Valley",
     "slug": "spiti-valley",
     "description": "Spiti is a place where you witness the rawness of nature. The weather, the surroundings, the roads, the places you visit, the people, everything leaves a surreal feeling of emptiness but completeness.",
@@ -118,6 +122,7 @@
     ]
   },
   {
+    "id": "9fdc5e9f-f90e-445d-9fcd-324331195b0a",
     "title": "Pondicherry",
     "slug": "pondicherry",
     "description": "Pondicherry is a coastal town in south-east India which is famous for its beaches, the French legacy that is preserved in the infrastructure and the world famous Aurobindo Ashram.",
@@ -137,6 +142,7 @@
     ]
   },
   {
+    "id": "8afdb3df-6f58-4901-b5f7-e48cbe5d324a",
     "title": "Mysore",
     "slug": "mysore",
     "description": "My first solo travel. When you think of Mysore you think of kingdoms and the rich heritage. The grandeur is visible in the architecture of this city.",
@@ -164,6 +170,7 @@
     ]
   },
   {
+    "id": "f10464ef-22ae-45ca-90f6-a61f070f4b94",
     "title": "Manali",
     "slug": "manali",
     "description": "India's one of the most famous \"hill stations\", Manali has a special place in my heart. You feel the nature up-close here without losing that city-like vibe of beautiful cafes and restaurants. It also serves as a gateway to vast number of remote places in the Himalayas like the Spiti Valley and Leh.",
@@ -206,6 +213,7 @@
     ]
   },
   {
+    "id": "178bac35-c35a-4ec2-ba08-057e64c219a5",
     "title": "Udupi",
     "slug": "udupi",
     "description": "Udupi is a laid back place if you want to enjoy beaches in peace. It's a quite city with some pleasing places to visit like the Delta point, Kaup lighthouse and the St. Mary's Island.",
@@ -227,8 +235,8 @@
       "IMG_20211220_193827.jpg"
     ]
   },
-
   {
+    "id": "ca376dfb-84c3-46be-bee4-2a45c5bda3ce",
     "title": "Triund",
     "slug": "triund",
     "description": "Triund is at the foot of the mighty Dhauladhar ranges (which are visible in some of the pictures) and was my first proper hike and camp experience.",
@@ -260,6 +268,7 @@
     ]
   },
   {
+    "id": "db4a04f4-d8ca-4074-86f2-ecc22694ceda",
     "title": "Wayanad",
     "slug": "wayanad",
     "description": "Wayanad welcomed us for a weekend getaway. My first bike trip and what better way to do that than the Bangalore-Wayanad route. Visited the Edakkal caves but most time spent relaxing at the gorgeous Zostel Wayanad with a view of the Chembra Peak.",

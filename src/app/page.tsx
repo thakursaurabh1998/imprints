@@ -1,8 +1,8 @@
 import { Metadata } from 'next';
 
 import PhotoCard from '@/components/PhotoCard';
+import photogridStyles from '@/components/PhotoGrid/PhotoGrid.module.css';
 import config from '@/config';
-import photogridStyles from '../components/PhotoGrid/PhotoGrid.module.css';
 
 export const metadata: Metadata = {
   title: config.title,

@@ -2,8 +2,8 @@
 
 import { useState } from 'react';
 
-import { Collection } from '@/utils/generate-collection-config';
-import CarouselModal from '../CarouselModal';
+import CarouselModal from '@/components/CarouselModal';
+import { Collection } from '@/utils/collection-config';
 import styles from './PhotoGrid.module.css';
 
 interface PhotoGridProps {

@@ -1,6 +1,6 @@
 import config from '@/config';
 import { Metadata } from 'next';
-import { Collection } from './generate-collection-config';
+import { Collection } from './collection-config';
 
 export function generateCollectionMetadata(
   collectionObject: Collection | null,
