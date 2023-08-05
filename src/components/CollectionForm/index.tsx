@@ -3,17 +3,21 @@ import { useFormik } from 'formik';
 import Image from 'next/image';
 import { useState } from 'react';
 
+import LoaderButton from '@/components/LoaderButton';
 import SortableGrid from '@/components/SortableGrid';
+import UploadDrawer from '@/components/UploadDrawer';
 import { Collection } from '@/utils/collection-config';
-import UploadDrawer from '../UploadDrawer';
+import { pushToUniqueList } from '@/utils/deduplicated-list';
 
 export default function CollectionForm({
-  createMode = false,
   collection,
+  isLoading = false,
+  createMode = false,
   onSubmit,
 }: {
   createMode?: boolean;
   collection: Collection;
+  isLoading?: boolean;
   // eslint-disable-next-line no-unused-vars
   onSubmit: (collection: Collection, uploadedFiles: File[]) => void;
 }) {
@@ -36,6 +40,21 @@ export default function CollectionForm({
     }
 
     return `/original/images/${collection.slug}/${picture}`;
+  }
+
+  function handleDrawerClose(uploadedImages: File[]) {
+    if (createMode) {
+      setUploadedFiles(uploadedImages);
+    }
+
+    const deduplicatedPictures = pushToUniqueList(
+      collectionForm.values.pictures,
+      uploadedImages.map((x) => x.name),
+    );
+
+    collectionForm.setFieldValue('pictures', deduplicatedPictures);
+
+    setUploadModalOpen(false);
   }
 
   return (
@@ -85,7 +104,7 @@ export default function CollectionForm({
           </Grid>
           <Grid item xs={12}>
             <Grid container paddingBottom={1}>
-              <Grid item xs={1} margin="auto">
+              <Grid item xs={1} marginY="auto">
                 <h3>Pictures</h3>
               </Grid>
               <Grid item xs={11}>
@@ -93,26 +112,11 @@ export default function CollectionForm({
                   createMode={createMode}
                   collectionId={collection.id}
                   show={uploadModalOpen}
-                  handleClose={(uploadedImages) => {
-                    if (createMode) {
-                      setUploadedFiles(uploadedImages);
-                    }
-
-                    const deduplicatedPictures = getDeduplicatedPictures(
-                      collectionForm.values.pictures,
-                      uploadedImages.map((x) => x.name),
-                    );
-
-                    collectionForm.setFieldValue(
-                      'pictures',
-                      deduplicatedPictures,
-                    );
-
-                    setUploadModalOpen(false);
-                  }}
+                  handleClose={handleDrawerClose}
                 />
                 <Button
                   variant="outlined"
+                  style={{ marginLeft: 10 }}
                   onClick={() => setUploadModalOpen(true)}
                 >
                   Upload
@@ -142,33 +146,12 @@ export default function CollectionForm({
             />
           </Grid>
           <Grid item xs={12}>
-            <Button variant="contained" color="primary" type="submit">
+            <LoaderButton loading={isLoading}>
               {createMode ? 'Create' : 'Update'}
-            </Button>
+            </LoaderButton>
           </Grid>
         </Grid>
       </Paper>
     </form>
   );
-}
-
-function getDeduplicatedPictures(
-  pictures: string[],
-  uploadedPictures: string[],
-) {
-  const newPictures = [...pictures];
-  let duplicateFound = false;
-
-  for (const up of uploadedPictures) {
-    if (pictures.includes(up)) {
-      duplicateFound = true;
-      continue;
-    }
-    newPictures.push(up);
-  }
-  if (duplicateFound) {
-    alert('Duplicate named pictures found');
-  }
-
-  return newPictures;
 }

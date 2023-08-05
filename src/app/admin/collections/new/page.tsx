@@ -2,6 +2,7 @@
 
 import { Grid, Typography } from '@mui/material';
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 import { useSWRConfig } from 'swr';
 import useSWRMutation from 'swr/mutation';
 import { v4 as uuid } from 'uuid';
@@ -12,14 +13,16 @@ import { uploadImage } from '@/utils/upload-image';
 
 export default function NewCollection() {
   const router = useRouter();
-  const { trigger } = useSWRMutation('/api/admin/new', createCollection);
+  const [loading, setLoading] = useState(false);
 
   const { mutate } = useSWRConfig();
+  const { trigger } = useSWRMutation('/api/admin/new', createCollection);
 
   const handleFormData = async (
     collectionData: Collection,
     uploadedFiles: File[],
   ) => {
+    setLoading(true);
     await trigger(collectionData, {
       onSuccess({ ok }) {
         if (ok) {
@@ -52,6 +55,7 @@ export default function NewCollection() {
       <Grid item sm={12} md={9}>
         <CollectionForm
           createMode
+          isLoading={loading}
           collection={{
             title: '',
             slug: '',
