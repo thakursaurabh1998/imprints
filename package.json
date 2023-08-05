@@ -6,8 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "imager": "node ./scripts/runner.js"
+    "lint": "next lint"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.0.8",
