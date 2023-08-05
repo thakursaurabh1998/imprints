@@ -1,3 +1,8 @@
+import {
+  FULL_IMAGE_DIRECTORY,
+  ORIGINAL_IMAGE_DIRECTORY,
+  THUMBS_IMAGE_DIRECTORY,
+} from './constants';
 import { readJSONFile, renameDirectory, writeJSONFile } from './file-system';
 
 export type Collection = {
@@ -46,9 +51,10 @@ export async function renameDirectoriesUsingSlug(
   newSlug: string,
 ) {
   const originalImagesPath = (slug: string) =>
-    `./public/original/images/${slug}`;
-  const thumbsImagesPath = (slug: string) => `./public/images/thumbs/${slug}`;
-  const fullImagesPath = (slug: string) => `./public/images/full/${slug}`;
+    `${ORIGINAL_IMAGE_DIRECTORY}/${slug}`;
+  const thumbsImagesPath = (slug: string) =>
+    `${THUMBS_IMAGE_DIRECTORY}/${slug}`;
+  const fullImagesPath = (slug: string) => `${FULL_IMAGE_DIRECTORY}/${slug}`;
 
   await renameDirectory(
     originalImagesPath(oldSlug),
