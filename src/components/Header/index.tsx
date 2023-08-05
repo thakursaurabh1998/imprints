@@ -1,7 +1,7 @@
 import { Grid, Link } from '@mui/material';
 
+import config from '@/config';
 import { IS_PRODUCTION } from '@/utils/constants';
-import config from '../../config';
 import styles from './Header.module.css';
 
 interface HeaderProps {

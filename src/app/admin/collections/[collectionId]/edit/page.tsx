@@ -4,10 +4,10 @@ import { Grid, Typography } from '@mui/material';
 import { notFound } from 'next/navigation';
 import useSWRMutation from 'swr/mutation';
 
+import CollectionForm from '@/components/CollectionForm';
 import { Collection } from '@/utils/collection-config';
 import { getCollectionMetaById } from '@/utils/collection-meta';
 import { hideInProduction } from '@/utils/hide-in-production';
-import CollectionForm from '../../../../../components/CollectionForm';
 
 export default function CollectionSet({
   params: { collectionId },

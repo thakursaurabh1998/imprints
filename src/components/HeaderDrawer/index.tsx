@@ -5,8 +5,8 @@ import { Paper } from '@mui/material';
 import SwipeableDrawer from '@mui/material/SwipeableDrawer';
 import { useState } from 'react';
 
-import Description from '../Description';
-import Header from '../Header';
+import Description from '@/components/Description';
+import Header from '@/components/Header';
 
 export default function HeaderDrawer() {
   const [open, setOpen] = useState(false);

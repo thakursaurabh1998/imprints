@@ -1,7 +1,7 @@
 import Modal from '@mui/material/Modal';
 
-import CloseButton from '../CloseButton';
-import PhotoCarousel from '../PhotoCarousel';
+import CloseButton from '@/components/CloseButton';
+import PhotoCarousel from '@/components/PhotoCarousel';
 
 interface CarouselModalProps {
   show: boolean;
