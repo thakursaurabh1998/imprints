@@ -1,6 +1,5 @@
 import fs from 'fs/promises';
 import path from 'path';
-import { ORIGINAL_IMAGE_DIRECTORY } from './constants';
 
 const EXCLUDED_FILES = ['.DS_Store'];
 
@@ -23,23 +22,21 @@ export function renameDirectory(oldPath: string, newPath: string) {
   return fs.rename(oldPath, newPath);
 }
 
-export async function writeOriginalImage({
+export async function writeFileToDirectory({
   filePath,
   buffer,
 }: {
   filePath: string;
   buffer: Buffer;
 }) {
-  const imagePath = `${ORIGINAL_IMAGE_DIRECTORY}/${filePath}`;
-  const directoryPath = getDirectory(imagePath);
-
+  const directoryPath = getDirectory(filePath);
   const isDirectoryPresent = await directoryExists(directoryPath);
 
   if (!isDirectoryPresent) {
     await createDirectory(directoryPath);
   }
 
-  return fs.writeFile(imagePath, buffer);
+  return fs.writeFile(filePath, buffer);
 }
 
 function getDirectory(filePath: string) {

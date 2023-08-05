@@ -1,8 +1,8 @@
-import { getCollectionMetaById } from '@/utils/collection-meta';
-import { writeOriginalImage } from '@/utils/file-system';
 import { NextRequest, NextResponse } from 'next/server';
 
-import { updateCollectionsAndWriteToJson } from '../../../../../utils/collection-config';
+import { updateCollectionsAndWriteToJson } from '@/utils/collection-config';
+import { getCollectionMetaById } from '@/utils/collection-meta';
+import { saveAllImageVariations } from '@/utils/save-image';
 
 // NOTE: We are only uploading 1 image at a time
 // so in case of multiple upload api calls, a race condition
@@ -30,8 +30,8 @@ export async function POST(
 
   const imageBuffer = Buffer.from(await imageFile.arrayBuffer());
 
-  await writeOriginalImage({
-    filePath: `${collection?.slug}/${imageFile.name}`,
+  await saveAllImageVariations({
+    relativeFilePath: `${collection?.slug}/${imageFile.name}`,
     buffer: imageBuffer,
   });
 
