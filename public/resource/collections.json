@@ -1,5 +1,25 @@
 [
   {
+    "title": "Tegernsee",
+    "slug": "tegernsee",
+    "pictures": [
+      "IMG_7979.jpeg",
+      "IMG_5516.jpeg",
+      "IMG_5558.jpeg",
+      "IMG_5577.jpeg",
+      "IMG_5584.jpeg",
+      "IMG_5523.jpeg",
+      "IMG_5539.jpeg",
+      "IMG_5538.jpeg",
+      "IMG_5529.jpeg",
+      "IMG_5556.jpeg",
+      "IMG_5572.jpeg"
+    ],
+    "description": "Tegernsee is a beautiful town located to the south of Munich, near the Austrian border. The Tegernsee mountains introduced me to the beauty of the Alps. The picturesque towns and lakes in this Bavarian region captured my heart. We celebrated a friend's birthday with a hike, drinking all the way through. It was certainly an amusing experience to witness them all swaying along the hiking trail :D",
+    "cover": "IMG_5577.jpeg",
+    "id": "bd0a4d8d-e701-4464-a2e3-529f4aeded92"
+  },
+  {
     "title": "Munich",
     "slug": "munich",
     "pictures": [
