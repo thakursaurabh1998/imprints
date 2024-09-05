@@ -1,5 +1,33 @@
 [
   {
+    "title": "Dresden",
+    "slug": "dresden",
+    "pictures": [
+      "IMG_8374.jpeg",
+      "IMG_8381.jpeg",
+      "IMG_8419.jpeg",
+      "IMG_8399.jpeg",
+      "IMG 8390.jpeg",
+      "IMG_8373.jpeg",
+      "IMG_8385.jpeg",
+      "IMG_8424.jpeg",
+      "IMG_8418.jpeg",
+      "IMG (6).jpeg",
+      "IMG 8367.jpeg",
+      "IMG 8364.jpeg",
+      "IMG_8389.jpeg",
+      "IMG_8387.jpeg",
+      "IMG_8393.jpeg",
+      "IMG_8378.jpeg",
+      "IMG_8415.jpeg",
+      "IMG_8371.jpeg",
+      "IMG_8404.jpeg"
+    ],
+    "description": "The city of Dresden. Glimmering with a Gothic vibe, it's a laid-back city in eastern Germany along the Elbe River. I stopped here for a day while on my way to Prague, and witnessed a different side of Germany. Sleeping in the garden, in front of the river, under a huge tree, during a fine summer afternoon has to be the highlight of my visit to Dresden.",
+    "cover": "IMG (6).jpeg",
+    "id": "d0ff3d38-82ce-4831-bcef-4beb5cddaad2"
+  },
+  {
     "title": "Holland",
     "slug": "holland",
     "pictures": [
