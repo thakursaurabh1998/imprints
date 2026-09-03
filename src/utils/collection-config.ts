@@ -85,14 +85,41 @@ export async function renameDirectoriesUsingSlug(
     FULL_IMAGE_DIRECTORY,
   ];
 
-  await Promise.all(
+  const moves = await Promise.all(
     directories.map(async (directory) => {
       const from = `${directory}/${oldSlug}`;
       const to = `${directory}/${newSlug}`;
 
-      if (!(await directoryExists(from))) return;
+      const [sourceExists, targetExists] = await Promise.all([
+        directoryExists(from),
+        directoryExists(to),
+      ]);
 
-      await renameDirectory(from, to);
+      return { from, to, sourceExists, targetExists };
     }),
+  );
+
+  /*
+   * Pre-flight every destination BEFORE moving anything. fs.rename onto an
+   * existing non-empty directory fails with ENOTEMPTY, and since the moves run
+   * together a late failure would leave some directories moved and others not
+   * — exactly the split state this function exists to prevent. The realistic
+   * way to hit it is leftovers from a discarded collection that used the
+   * target slug.
+   */
+  const blocked = moves.filter((move) => move.sourceExists && move.targetExists);
+
+  if (blocked.length > 0) {
+    throw new Error(
+      `Cannot rename slug "${oldSlug}" to "${newSlug}" because ` +
+        `${blocked.map((move) => move.to).join(', ')} already exists. ` +
+        `Remove the leftover directory and try again.`,
+    );
+  }
+
+  await Promise.all(
+    moves
+      .filter((move) => move.sourceExists)
+      .map((move) => renameDirectory(move.from, move.to)),
   );
 }

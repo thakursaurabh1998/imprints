@@ -44,7 +44,21 @@ export async function PUT(
   }
 
   if (currentData.slug !== data.slug) {
-    await renameDirectoriesUsingSlug(currentData.slug, data.slug);
+    try {
+      await renameDirectoriesUsingSlug(currentData.slug, data.slug);
+    } catch (err) {
+      /*
+       * Surface the reason instead of letting it become a bare 500. The client
+       * shows the response text in a toast, and the common failure here — a
+       * leftover directory already occupying the target slug — is only fixable
+       * if you're told which path is in the way. The manifest is deliberately
+       * left untouched, so nothing references directories that didn't move.
+       */
+      return new Response(
+        err instanceof Error ? err.message : 'Could not rename the slug.',
+        { status: 409 },
+      );
+    }
   }
 
   await updateCollectionsAndWriteToJson(collectionId, updatedCollection);
