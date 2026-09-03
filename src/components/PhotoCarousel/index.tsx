@@ -7,6 +7,7 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/effect-fade";
 
+import { getFullSource } from "@/utils/picture-source";
 import styles from "./PhotoCarousel.module.css";
 
 interface PhotoCarouselProps {
@@ -62,7 +63,7 @@ export default function PhotoCarousel({
             >
               <img
                 loading="lazy"
-                src={`/images/full/${slug}/${picture}`}
+                src={getFullSource(slug, picture)}
                 alt={picture}
                 className={styles.picture}
               />

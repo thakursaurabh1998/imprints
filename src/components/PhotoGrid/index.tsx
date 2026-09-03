@@ -4,6 +4,7 @@ import { useState } from 'react';
 
 import CarouselModal from '@/components/CarouselModal';
 import { Collection } from '@/utils/collection-config';
+import { getThumbsSource } from '@/utils/picture-source';
 import styles from './PhotoGrid.module.css';
 
 interface PhotoGridProps {
@@ -26,7 +27,7 @@ export default function PhotoGrid({ collection }: PhotoGridProps) {
           {collection.pictures.map((image, index) => (
             <img
               key={image}
-              src={`/images/thumbs/${collection.slug}/${image}`}
+              src={getThumbsSource(collection.slug, image)}
               alt={image}
               onClick={() => handleClickOnImage(index)}
             />
