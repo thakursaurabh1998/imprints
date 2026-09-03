@@ -1,6 +1,17 @@
 'use client';
 
-import { RefObject, useCallback, useEffect, useRef } from 'react';
+import {
+  RefObject,
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+} from 'react';
+
+// useLayoutEffect would warn during SSR; the layout timing only matters on
+// the client, where the paint we're racing actually happens.
+const useIsomorphicLayoutEffect =
+  typeof window !== 'undefined' ? useLayoutEffect : useEffect;
 
 const AXIS_LOCK_THRESHOLD_PX = 12;
 // Horizontal swipe-to-navigate is the primary gesture; vertical dismiss is
@@ -45,6 +56,10 @@ interface UseCarouselGestureOptions {
   // needs an explicit signal (flips once the real DOM mounts) to know it
   // should try attaching listeners again.
   ready: boolean;
+  // The currently committed slide index. The track's transform has to be
+  // reset in the same React commit that renders this new index — see the
+  // layout effect below.
+  index: number;
 }
 
 function prefersReducedMotion() {
@@ -79,6 +94,7 @@ export function useCarouselGesture({
   onNavigate,
   onDismiss,
   ready,
+  index,
 }: UseCarouselGestureOptions) {
   const latest = useRef({ canGoPrev, canGoNext, onNavigate, onDismiss });
   latest.current = { canGoPrev, canGoNext, onNavigate, onDismiss };
@@ -185,16 +201,37 @@ export function useCarouselGesture({
     animateTo(0, 0, 1, 1);
   }, [animateTo]);
 
+  // THE fix for the one-frame flash of the previous photo.
+  //
+  // commitNavigate used to reset the track's transform to 0 synchronously
+  // and then call onNavigate(). But onNavigate is a React setState, and an
+  // update scheduled from a non-React listener (transitionend / setTimeout)
+  // is flushed by React's scheduler in a *later* task — so the browser gets
+  // a chance to paint in between. In that window the transform is already
+  // back at 0 while the slides still render the OLD index, and `.current`
+  // at offset 0 is dead centre, full screen: the previous photo flashes for
+  // a frame. Measured directly, that window was ~6ms wide.
+  //
+  // A layout effect runs after React mutates the DOM for the new index but
+  // *before* paint, so resetting here makes "new index" and "transform back
+  // to 0" a single atomic, unpaintable-in-between step.
+  useIsomorphicLayoutEffect(() => {
+    setTrackStyle(0, 0, 1, 1, 'none');
+  }, [index, setTrackStyle]);
+
   const commitNavigate = useCallback(
     (direction: 1 | -1) => {
       const stage = stageRef.current;
       const width = stage?.clientWidth ?? window.innerWidth;
       animateTo(direction === 1 ? -width : width, 0, 1, 1, () => {
-        setTrackStyle(0, 0, 1, 1, 'none');
+        // Deliberately does NOT reset the transform here. Leaving the track
+        // parked at ±width keeps the *correct* photo on screen until React
+        // commits the new index; the reset happens in the layout effect
+        // below, atomically with that commit.
         latest.current.onNavigate(direction);
       });
     },
-    [animateTo, setTrackStyle, stageRef],
+    [animateTo, stageRef],
   );
 
   const commitDismiss = useCallback(() => {

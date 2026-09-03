@@ -60,6 +60,7 @@ export default function Lightbox({
       ),
     onDismiss: onClose,
     ready: portalReady,
+    index,
   });
 
   useScrollLock({ containerRef: dialogRef, returnFocusRef });
