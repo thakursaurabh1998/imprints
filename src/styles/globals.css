@@ -9,13 +9,15 @@
 html,
 body {
   /*
-   * `clip`, not `hidden`. `overflow-x: hidden` forces overflow-y to compute to
-   * `auto`, which makes these scroll containers — and any `position: sticky`
-   * descendant then sticks to a scrollport that never moves, silently killing
-   * sticky app-wide. `clip` clips identically without establishing a scroll
-   * container, so overflow-y stays `visible` and sticky works.
+   * Keep this as `hidden`, NOT `clip`. `clip` looks like the tidier fix (it
+   * doesn't create a scroll container, so `position: sticky` works app-wide)
+   * but it stops Chrome loading `loading="lazy"` images entirely — even ones
+   * already in the viewport. Measured on the Prague editor: 0/74 tiles loaded
+   * under `clip` vs 74/74 under `hidden`, and the public PhotoCarousel broke
+   * the same way. Admin gets sticky via its own scroll container instead
+   * (see admin layout.module.css).
    */
-  overflow-x: clip;
+  overflow-x: hidden;
   max-width: 100vw;
   background-color: #1f2224;
 }

@@ -1,5 +1,18 @@
+/*
+ * The admin shell is its own scroll container. That's what makes the sticky
+ * AdminHeader and the sticky table head work: html/body must stay on
+ * `overflow-x: hidden` (see globals.css — `clip` breaks lazy image loading),
+ * which makes body a scrollport that never scrolls, so viewport-relative
+ * sticky is dead. Scrolling here instead gives sticky a real scrollport, and
+ * a genuine `overflow-y: auto` container keeps lazy loading working.
+ *
+ * Height accounts for `.app-body`'s 61px bottom padding (globals.css), which
+ * clears the site header that's fixed to the bottom of the viewport. Matching
+ * it exactly avoids a second, outer scrollbar.
+ */
 .shell {
-  min-height: calc(100vh - var(--a-site-header));
+  height: calc(100vh - 61px);
+  overflow-y: auto;
   background: var(--a-bg);
 }
 
