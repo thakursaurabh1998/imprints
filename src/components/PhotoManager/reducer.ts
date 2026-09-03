@@ -39,7 +39,7 @@ export type PhotoManagerAction =
   | { type: 'markUploading'; filename: string }
   | { type: 'markReady'; filename: string }
   | { type: 'markFailed'; filename: string; error: string }
-  | { type: 'removeSelected' }
+  | { type: 'remove'; filenames: string[] }
   | { type: 'undoRemove' }
   | { type: 'reorder'; order: string[] }
   | { type: 'setCover'; filename: string }
@@ -85,13 +85,15 @@ export function photoManagerReducer(
         },
       };
 
-    case 'removeSelected': {
-      const toRemove = new Set(state.selected);
+    case 'remove': {
+      const toRemove = new Set(action.filenames);
       if (toRemove.size === 0) return state;
 
       const lastRemoved = state.order
         .map((filename, index) => ({ filename, index }))
         .filter(({ filename }) => toRemove.has(filename));
+
+      if (lastRemoved.length === 0) return state;
 
       const order = state.order.filter((filename) => !toRemove.has(filename));
       const items = { ...state.items };
@@ -104,7 +106,9 @@ export function photoManagerReducer(
         order,
         items,
         cover,
-        selected: [],
+        // Removing a single tile via its hover action shouldn't discard an
+        // unrelated multi-selection, so only drop what actually went away.
+        selected: state.selected.filter((filename) => !toRemove.has(filename)),
         lastSelectedIndex: null,
         lastRemoved,
       };

@@ -1,0 +1,189 @@
+.wrap {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.table th {
+  padding: 0 14px 11px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-align: left;
+  color: var(--a-text-dim);
+  white-space: nowrap;
+}
+
+.row {
+  transition: background 120ms ease;
+}
+
+.row:hover {
+  background: var(--a-surface-2);
+}
+
+.row td {
+  padding: 12px 14px;
+  border-top: 1px solid var(--a-border);
+  vertical-align: middle;
+}
+
+.row:hover .actions {
+  opacity: 1;
+}
+
+.coverCell {
+  width: 72px;
+}
+
+.cover {
+  display: block;
+  width: 56px;
+  height: 56px;
+  object-fit: cover;
+  border-radius: var(--a-radius-sm);
+  background: var(--a-surface-3);
+  border: 1px solid var(--a-border);
+}
+
+.coverEmpty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: var(--a-radius-sm);
+  background: var(--a-surface-3);
+  border: 1px dashed var(--a-border-strong);
+  font-size: 16px;
+  color: var(--a-text-dim);
+}
+
+.titleCell {
+  min-width: 200px;
+}
+
+.titleLink {
+  display: inline-block;
+  margin-bottom: 5px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #fff;
+  text-decoration: none;
+}
+
+.titleLink:hover {
+  color: var(--a-accent);
+}
+
+.meta {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-wrap: wrap;
+}
+
+.description {
+  max-width: 380px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--a-text-muted);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.count {
+  font-family: var(--a-mono);
+  font-size: 13px;
+  color: var(--a-text-muted);
+  white-space: nowrap;
+}
+
+.actionsCell {
+  width: 1%;
+  white-space: nowrap;
+}
+
+.actions {
+  display: flex;
+  gap: 7px;
+  justify-content: flex-end;
+  opacity: 0.35;
+  transition: opacity 120ms ease;
+}
+
+/* Keyboard users never trigger :hover, so reveal on focus too. */
+.actions:focus-within {
+  opacity: 1;
+}
+
+.empty {
+  padding: 56px 20px;
+  text-align: center;
+}
+
+.emptyTitle {
+  margin: 0 0 7px;
+  font-size: 17px;
+  font-weight: 400;
+  color: var(--a-text);
+}
+
+.emptyBody {
+  margin: 0 0 20px;
+  font-size: 13.5px;
+  color: var(--a-text-muted);
+}
+
+.skeletonRow td {
+  padding: 12px 14px;
+  border-top: 1px solid var(--a-border);
+}
+
+.skeleton {
+  height: 14px;
+  border-radius: 4px;
+  background: linear-gradient(
+    90deg,
+    var(--a-surface-2) 25%,
+    var(--a-surface-3) 37%,
+    var(--a-surface-2) 63%
+  );
+  background-size: 400% 100%;
+  animation: shimmer 1.3s ease infinite;
+}
+
+.skeletonCover {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--a-radius-sm);
+}
+
+@keyframes shimmer {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: -100% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton {
+    animation: none;
+  }
+}
+
+@media (max-width: 860px) {
+  .description,
+  .descriptionHead {
+    display: none;
+  }
+}

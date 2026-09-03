@@ -1,0 +1,180 @@
+.tile {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  background: var(--a-surface-2);
+  border: 1px solid var(--a-border);
+  border-radius: var(--a-radius-sm);
+  cursor: pointer;
+  transition: border-color 120ms ease, box-shadow 120ms ease;
+}
+
+.tile:focus-visible {
+  outline: none;
+  box-shadow: var(--a-focus);
+}
+
+.image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* Hardware-friendly and, more importantly, prevents the browser from
+     re-laying-out neighbours while dnd-kit transforms this tile. */
+  transition: transform 200ms ease;
+}
+
+.tile:hover .image {
+  transform: scale(1.04);
+}
+
+.selected {
+  border-color: var(--a-accent);
+  box-shadow: 0 0 0 2px var(--a-accent) inset;
+}
+
+.isCover {
+  border-color: rgba(245, 166, 35, 0.55);
+}
+
+.pending {
+  opacity: 0.55;
+}
+
+.failed {
+  border-color: rgba(229, 72, 77, 0.55);
+}
+
+/* ---- placeholder shown before a preview exists ---- */
+
+.placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  width: 100%;
+  height: 100%;
+  padding: 10px;
+  text-align: center;
+}
+
+.placeholderName {
+  font-size: 10.5px;
+  line-height: 1.35;
+  color: var(--a-text-dim);
+  overflow-wrap: anywhere;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.errorText {
+  font-size: 11px;
+  line-height: 1.4;
+  color: #ff8a8d;
+  overflow-wrap: anywhere;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ---- overlays ---- */
+
+.scrim {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: rgba(0, 0, 0, 0.45);
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.actions {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  display: flex;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity 120ms ease;
+}
+
+.tile:hover .actions,
+.tile:focus-within .actions {
+  opacity: 1;
+}
+
+.action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 25px;
+  height: 25px;
+  padding: 0;
+  background: rgba(0, 0, 0, 0.62);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 5px;
+  color: #fff;
+  font-size: 12px;
+  line-height: 1;
+  cursor: pointer;
+  backdrop-filter: blur(3px);
+  transition: background 110ms ease, color 110ms ease;
+}
+
+.action:hover {
+  background: rgba(0, 0, 0, 0.85);
+}
+
+.actionCover:hover {
+  background: var(--a-accent);
+  color: var(--a-accent-ink);
+  border-color: var(--a-accent);
+}
+
+.actionRemove:hover {
+  background: var(--a-danger);
+  border-color: var(--a-danger);
+}
+
+.action:focus-visible {
+  outline: none;
+  box-shadow: var(--a-focus);
+}
+
+.coverBadge {
+  position: absolute;
+  bottom: 5px;
+  left: 5px;
+  padding: 2px 7px;
+  background: var(--a-accent);
+  border-radius: 3px;
+  color: var(--a-accent-ink);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.check {
+  position: absolute;
+  bottom: 5px;
+  right: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 19px;
+  height: 19px;
+  background: var(--a-accent);
+  border-radius: 50%;
+  color: var(--a-accent-ink);
+  font-size: 11px;
+  font-weight: 700;
+}

@@ -15,9 +15,9 @@ import {
   SortableContext,
   sortableKeyboardCoordinates,
 } from '@dnd-kit/sortable';
-import { Grid } from '@mui/material';
 import React from 'react';
 
+import styles from './SortableGrid.module.css';
 import { SortableItem } from './SortableItem';
 
 type SortableItemType = { id: UniqueIdentifier; itemNode: React.ReactNode };
@@ -53,15 +53,13 @@ export default function SortableGrid({ items, onChange }: SortableGridProps) {
       onDragEnd={handleDragEnd}
     >
       <SortableContext items={items}>
-        <Grid container>
-          {items.map((item) => {
-            return (
-              <SortableItem key={item.id} id={item.id}>
-                <Grid item>{item.itemNode}</Grid>
-              </SortableItem>
-            );
-          })}
-        </Grid>
+        <div className={styles.grid}>
+          {items.map((item) => (
+            <SortableItem key={item.id} id={item.id}>
+              {item.itemNode}
+            </SortableItem>
+          ))}
+        </div>
       </SortableContext>
     </DndContext>
   );

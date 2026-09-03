@@ -1,0 +1,65 @@
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(132px, 1fr));
+  gap: 10px;
+}
+
+@media (max-width: 640px) {
+  .grid {
+    grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
+    gap: 7px;
+  }
+}
+
+.item {
+  position: relative;
+  /* Keeps the dragged tile above its neighbours instead of clipping under
+     them mid-gesture. */
+  touch-action: none;
+}
+
+.dragging {
+  z-index: 3;
+  opacity: 0.85;
+}
+
+.handle {
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 25px;
+  height: 25px;
+  background: rgba(0, 0, 0, 0.62);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 5px;
+  color: #fff;
+  font-size: 13px;
+  line-height: 1;
+  cursor: grab;
+  user-select: none;
+  opacity: 0;
+  backdrop-filter: blur(3px);
+  transition: opacity 120ms ease, background 110ms ease;
+}
+
+.item:hover .handle,
+.handle:focus-visible {
+  opacity: 1;
+}
+
+.handle:hover {
+  background: rgba(0, 0, 0, 0.85);
+}
+
+.handle:active {
+  cursor: grabbing;
+}
+
+.handle:focus-visible {
+  outline: none;
+  box-shadow: var(--a-focus);
+}

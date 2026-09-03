@@ -1,12 +1,13 @@
 'use client';
 
-import { Chip, Grid, Typography } from '@mui/material';
 import { notFound } from 'next/navigation';
 import { useState } from 'react';
 import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
 
+import AdminHeader from '@/components/AdminHeader';
 import CollectionForm from '@/components/CollectionForm';
+import { Badge, Button, Spinner } from '@/components/ui';
 import { Collection } from '@/utils/collection-config';
 import { useDebouncedCallback } from '@/utils/debounce';
 import { hideInProduction } from '@/utils/hide-in-production';
@@ -34,10 +35,9 @@ export default function CollectionSet({
     `/api/admin/${collectionId}`,
     fetcher,
   );
-  const { data: draft, mutate: mutateDraft } = useSWR<Partial<Collection> | null>(
-    `/api/admin/${collectionId}/draft`,
-    fetcher,
-  );
+  const { data: draft, mutate: mutateDraft } = useSWR<
+    Partial<Collection> | null
+  >(`/api/admin/${collectionId}/draft`, fetcher);
 
   const { trigger } = useSWRMutation(
     `/api/admin/${collectionId}`,
@@ -60,7 +60,20 @@ export default function CollectionSet({
   // CollectionForm (and locking in Formik's initialValues) before we know
   // whether there's a draft to overlay.
   if (!collection || draft === undefined) {
-    return null;
+    return (
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 11,
+          padding: '80px 0',
+          color: 'var(--a-text-dim)',
+          fontSize: 13.5,
+        }}
+      >
+        <Spinner /> Loading collection…
+      </div>
+    );
   }
 
   const hasDraft = Boolean(draft);
@@ -77,34 +90,38 @@ export default function CollectionSet({
   };
 
   return (
-    <Grid
-      container
-      flexDirection="column"
-      paddingX={5}
-      paddingY={2}
-      rowSpacing={2}
-    >
-      <Grid item>
-        <Typography variant="h2">
-          {mergedCollection.title}
-          {hasDraft && (
-            <Chip
-              label="Unpublished changes"
-              color="warning"
-              sx={{ ml: 2, verticalAlign: 'middle' }}
-            />
-          )}
-        </Typography>
-      </Grid>
-      <Grid item sm={12} md={9}>
-        <CollectionForm
-          isLoading={loading}
-          collection={mergedCollection}
-          onSubmit={handleFormData}
-          onChange={saveDraft}
-        />
-      </Grid>
-    </Grid>
+    <>
+      <AdminHeader
+        backHref="/admin/collections"
+        title={mergedCollection.title || 'Untitled collection'}
+        badges={
+          <>
+            <Badge mono>/{mergedCollection.slug}</Badge>
+            <Badge>{mergedCollection.pictures.length} photos</Badge>
+            {hasDraft && (
+              <Badge tone="accent" dot>
+                Unpublished
+              </Badge>
+            )}
+          </>
+        }
+        actions={
+          <Button
+            variant="ghost"
+            href={`/collection/${mergedCollection.slug}`}
+          >
+            Preview
+          </Button>
+        }
+      />
+
+      <CollectionForm
+        isLoading={loading}
+        collection={mergedCollection}
+        onSubmit={handleFormData}
+        onChange={saveDraft}
+      />
+    </>
   );
 }
 
