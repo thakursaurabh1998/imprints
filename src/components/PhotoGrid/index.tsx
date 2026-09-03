@@ -34,7 +34,9 @@ export default function PhotoGrid({ collection }: PhotoGridProps) {
                 thumbRefs.current[index] = el;
               }}
               src={getThumbsSource(collection.slug, image)}
-              alt={image}
+              alt={`${collection.title} — photo ${index + 1}`}
+              loading="lazy"
+              decoding="async"
               tabIndex={0}
               role="button"
               onClick={() => handleClickOnImage(index)}
