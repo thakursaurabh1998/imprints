@@ -111,10 +111,21 @@ export function useCarouselGesture({
       scale: number,
       onDone?: () => void,
     ) => {
-      const reduceMotion = prefersReducedMotion();
       const track = trackRef.current;
+      // A backgrounded/hidden tab (or a user's reduced-motion preference)
+      // won't reliably animate — worse, on a hidden tab Chrome throttles
+      // timers and event dispatch hard, so `transitionend` and the
+      // fallback timer below can both be delayed by seconds even though
+      // the visual state already jumped to its target. Committing the
+      // index update only after that delayed signal is exactly what
+      // produces a "stuck on the wrong slide" flicker, so skip the
+      // animation and commit immediately whenever it can't play cleanly.
+      const skipAnimation =
+        prefersReducedMotion() ||
+        !track ||
+        (typeof document !== 'undefined' && document.visibilityState !== 'visible');
 
-      if (reduceMotion || !track) {
+      if (skipAnimation) {
         setTrackStyle(dx, dy, opacity, scale, 'none');
         onDone?.();
         return;
@@ -127,11 +138,23 @@ export function useCarouselGesture({
         if (settled) return;
         settled = true;
         track.removeEventListener('transitionend', finish);
+        document.removeEventListener('visibilitychange', handleVisibilityChange);
         window.clearTimeout(fallbackTimer);
         onDone?.();
       };
 
+      // If the tab is backgrounded mid-transition, jump straight to the
+      // target instead of leaving the commit stranded behind a throttled
+      // timer/event.
+      function handleVisibilityChange() {
+        if (document.visibilityState !== 'visible') {
+          setTrackStyle(dx, dy, opacity, scale, 'none');
+          finish();
+        }
+      }
+
       track.addEventListener('transitionend', finish);
+      document.addEventListener('visibilitychange', handleVisibilityChange);
       const fallbackTimer = window.setTimeout(finish, SNAP_DURATION_MS + 50);
 
       setTrackStyle(dx, dy, opacity, scale, transition);
