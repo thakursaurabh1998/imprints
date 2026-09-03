@@ -2,8 +2,102 @@
   display: flex;
   flex-direction: column;
   gap: 20px;
-  /* Clear the fixed publish bar so the last panel is never hidden behind it. */
-  padding-bottom: 96px;
+}
+
+/*
+ * Open layout: no panel boxes, just two columns of content separated by a
+ * hairline divider. Bounded so this row exactly fills what's left of
+ * .shell's own viewport-derived height below the sticky AdminHeader and
+ * above .container's own bottom clearance — reaching all the way down to
+ * just above the fixed site footer, with no leftover gap. If it falls short
+ * of that, nothing looks broken; if it overshoots, .shell gains scrollable
+ * overflow and wheeling over Details (which has nothing to scroll
+ * internally, see .detailsCol) bubbles straight up and scrolls the whole
+ * page instead of doing nothing.
+ *
+ *   61  = .shell's own `100vh - 61px` (admin/layout.module.css)
+ *   26  = AdminHeader's margin-bottom (AdminHeader.module.css)
+ *   48  = .container's padding-bottom (admin/layout.module.css)
+ *
+ * The publish bar (below) floats over the bottom of this row when it's
+ * showing, the same way it always floats over content — that's fine, since
+ * Photos scrolls internally and Details has nothing that ends up under it.
+ */
+.columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  align-items: stretch;
+  height: calc(100vh - var(--a-admin-header) - 135px);
+}
+
+.sectionTitle {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  color: var(--a-text-dim);
+}
+
+.detailsCol {
+  padding-right: 40px;
+  overflow-y: auto;
+}
+
+.detailsCol .sectionTitle {
+  margin-bottom: 18px;
+}
+
+/*
+ * A fixed header (title + columns control) and a scrolling body below it, so
+ * the Photos heading and its controls stay put while the grid underneath
+ * scrolls.
+ */
+.photosCol {
+  display: flex;
+  flex-direction: column;
+  padding-left: 40px;
+  border-left: 1px solid var(--a-border);
+  overflow: hidden;
+}
+
+.photosHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding-bottom: 14px;
+  margin-bottom: 14px;
+  border-bottom: 1px solid var(--a-border);
+}
+
+.photosBody {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.columnsControl {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.columnsLabel {
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--a-text-dim);
+}
+
+.columnsValue {
+  min-width: 14px;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--a-text);
 }
 
 .grid {
@@ -17,6 +111,37 @@
 }
 
 @media (max-width: 640px) {
+  .stack {
+    /*
+     * Below 640px the columns collapse back to a normal stacked flow (the
+     * whole page scrolls, Photos included), so the last panel needs this
+     * clearance again or the fixed publish bar can permanently cover it.
+     */
+    padding-bottom: 96px;
+  }
+
+  .columns {
+    grid-template-columns: 1fr;
+    height: auto;
+  }
+
+  .detailsCol {
+    padding-right: 0;
+    padding-bottom: 32px;
+    overflow: visible;
+  }
+
+  .photosCol {
+    display: block;
+    padding-left: 0;
+    border-left: none;
+    overflow: visible;
+  }
+
+  .photosBody {
+    overflow: visible;
+  }
+
   .grid {
     grid-template-columns: 1fr;
   }
