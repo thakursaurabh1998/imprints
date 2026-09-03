@@ -88,7 +88,7 @@ function createDirectory(directoryPath: string) {
   return fs.mkdir(directoryPath, { recursive: true });
 }
 
-function directoryExists(directoryPath: string) {
+export function directoryExists(directoryPath: string) {
   return fs
     .access(directoryPath)
     .then(() => true)

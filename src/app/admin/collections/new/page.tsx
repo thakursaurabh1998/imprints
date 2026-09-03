@@ -9,15 +9,8 @@ import AdminHeader from '@/components/AdminHeader';
 import { Button, Input, Panel, Textarea, useToast } from '@/components/ui';
 import { Collection } from '@/utils/collection-config';
 import { hideInProduction } from '@/utils/hide-in-production';
+import { tidySlug, toSlugChars } from '@/utils/slug';
 import styles from './page.module.css';
-
-function slugify(value: string) {
-  return value
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '');
-}
 
 export default function NewCollection() {
   hideInProduction();
@@ -35,9 +28,10 @@ export default function NewCollection() {
 
   const { trigger } = useSWRMutation('/api/admin/new', createCollection);
 
-  const effectiveSlug = slugTouched ? slug : slugify(title);
+  const effectiveSlug = slugTouched ? slug : tidySlug(title);
+  const submittedSlug = tidySlug(effectiveSlug);
   const canSubmit =
-    title.trim() !== '' && effectiveSlug !== '' && description.trim() !== '';
+    title.trim() !== '' && submittedSlug !== '' && description.trim() !== '';
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -53,7 +47,7 @@ export default function NewCollection() {
       const res = await trigger({
         id,
         title: title.trim(),
-        slug: effectiveSlug,
+        slug: submittedSlug,
         description: description.trim(),
         cover: '',
         pictures: [],
@@ -98,8 +92,9 @@ export default function NewCollection() {
               hint="URL and image folder name"
               onChange={(e) => {
                 setSlugTouched(true);
-                setSlug(slugify(e.target.value));
+                setSlug(toSlugChars(e.target.value));
               }}
+              onBlur={() => setSlug((current) => tidySlug(current))}
             />
             <div className={styles.full}>
               <Textarea
