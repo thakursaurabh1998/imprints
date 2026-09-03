@@ -1,0 +1,83 @@
+.bar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-height: 62px;
+  padding: 12px 0;
+  margin-bottom: 26px;
+  background: linear-gradient(
+    to bottom,
+    var(--a-bg) 62%,
+    rgba(31, 34, 36, 0.86) 100%
+  );
+  backdrop-filter: blur(6px);
+  border-bottom: 1px solid var(--a-border);
+}
+
+.identity {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  flex: 1;
+}
+
+.eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  color: var(--a-text-dim);
+}
+
+.back {
+  color: var(--a-text-dim);
+  text-decoration: none;
+  transition: color 120ms ease;
+}
+
+.back:hover {
+  color: var(--a-accent);
+}
+
+.titleRow {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  min-width: 0;
+}
+
+.title {
+  margin: 0;
+  font-size: 25px;
+  font-weight: 300;
+  letter-spacing: 0.015em;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  flex: none;
+}
+
+@media (max-width: 640px) {
+  .bar {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .title {
+    font-size: 20px;
+  }
+}

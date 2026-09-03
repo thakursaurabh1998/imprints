@@ -1,0 +1,79 @@
+.viewport {
+  position: fixed;
+  right: 20px;
+  /* Clear the site header, which is fixed to the bottom of the viewport. */
+  bottom: calc(var(--a-site-header) + 16px);
+  z-index: 40;
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 10px;
+  width: min(380px, calc(100vw - 40px));
+  pointer-events: none;
+}
+
+.toast {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  padding: 12px 13px;
+  background: var(--a-surface-2);
+  border: 1px solid var(--a-border-strong);
+  border-left-width: 3px;
+  border-radius: var(--a-radius-sm);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+  pointer-events: auto;
+  animation: slide-in 180ms cubic-bezier(0.2, 0.9, 0.3, 1);
+}
+
+@keyframes slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toast {
+    animation: none;
+  }
+}
+
+.info {
+  border-left-color: var(--a-text-dim);
+}
+
+.success {
+  border-left-color: var(--a-success);
+}
+
+.warning {
+  border-left-color: var(--a-accent);
+}
+
+.error {
+  border-left-color: var(--a-danger);
+}
+
+.body {
+  flex: 1;
+  min-width: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--a-text);
+  overflow-wrap: anywhere;
+}
+
+.dismiss {
+  flex: none;
+  padding: 0 3px;
+  background: none;
+  border: none;
+  color: var(--a-text-dim);
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.dismiss:hover {
+  color: var(--a-text);
+}

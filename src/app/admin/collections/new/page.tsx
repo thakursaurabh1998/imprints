@@ -1,96 +1,127 @@
 'use client';
 
-import { Grid, Paper, TextField, Typography } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import { FormEvent, useState } from 'react';
 import useSWRMutation from 'swr/mutation';
 import { v4 as uuid } from 'uuid';
 
-import LoaderButton from '@/components/LoaderButton';
+import AdminHeader from '@/components/AdminHeader';
+import { Button, Input, Panel, Textarea, useToast } from '@/components/ui';
 import { Collection } from '@/utils/collection-config';
 import { hideInProduction } from '@/utils/hide-in-production';
+import styles from './page.module.css';
+
+function slugify(value: string) {
+  return value
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
 
 export default function NewCollection() {
   hideInProduction();
 
   const router = useRouter();
+  const toast = useToast();
+
   const [loading, setLoading] = useState(false);
   const [id] = useState(() => uuid());
   const [title, setTitle] = useState('');
   const [slug, setSlug] = useState('');
   const [description, setDescription] = useState('');
+  // Once the slug is hand-edited, stop deriving it from the title.
+  const [slugTouched, setSlugTouched] = useState(false);
 
   const { trigger } = useSWRMutation('/api/admin/new', createCollection);
 
+  const effectiveSlug = slugTouched ? slug : slugify(title);
+  const canSubmit =
+    title.trim() !== '' && effectiveSlug !== '' && description.trim() !== '';
+
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
+
+    if (!canSubmit) {
+      toast.show('Title, slug, and description are all required.', 'warning');
+      return;
+    }
+
     setLoading(true);
 
-    const res = await trigger({
-      id,
-      title,
-      slug,
-      description,
-      cover: '',
-      pictures: [],
-    });
+    try {
+      const res = await trigger({
+        id,
+        title: title.trim(),
+        slug: effectiveSlug,
+        description: description.trim(),
+        cover: '',
+        pictures: [],
+      });
 
-    if (res?.ok) {
-      router.replace(`/admin/collections/${id}/edit`);
-    } else {
-      alert('Collection creation failed!');
-      setLoading(false);
+      if (res?.ok) {
+        router.replace(`/admin/collections/${id}/edit`);
+        return;
+      }
+
+      const reason = res ? await res.text() : 'Unknown error';
+      toast.show(`Could not create the collection — ${reason}`, 'error');
+    } catch (err) {
+      toast.show(
+        err instanceof Error ? err.message : 'Could not create the collection.',
+        'error',
+      );
     }
+
+    setLoading(false);
   }
 
   return (
-    <Grid
-      container
-      flexDirection="column"
-      paddingX={5}
-      paddingY={2}
-      rowSpacing={2}
-    >
-      <Grid item>
-        <Typography variant="h2">New Collection</Typography>
-      </Grid>
-      <Grid item sm={12} md={9}>
-        <form onSubmit={handleSubmit}>
-          <Paper sx={{ p: 2 }}>
-            <Grid container spacing={2}>
-              <Grid item xs={6}>
-                <TextField
-                  fullWidth
-                  label="Title"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                />
-              </Grid>
-              <Grid item xs={6}>
-                <TextField
-                  fullWidth
-                  label="Slug"
-                  value={slug}
-                  onChange={(e) => setSlug(e.target.value)}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  multiline
-                  label="Description"
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <LoaderButton loading={loading}>Create</LoaderButton>
-              </Grid>
-            </Grid>
-          </Paper>
-        </form>
-      </Grid>
-    </Grid>
+    <>
+      <AdminHeader backHref="/admin/collections" title="New collection" />
+
+      <form className={styles.form} onSubmit={handleSubmit}>
+        <Panel title="Details">
+          <div className={styles.grid}>
+            <Input
+              label="Title"
+              placeholder="Prague"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              autoFocus
+            />
+            <Input
+              label="Slug"
+              mono
+              placeholder="prague"
+              value={effectiveSlug}
+              hint="URL and image folder name"
+              onChange={(e) => {
+                setSlugTouched(true);
+                setSlug(slugify(e.target.value));
+              }}
+            />
+            <div className={styles.full}>
+              <Textarea
+                label="Description"
+                placeholder="A few lines about this set of photographs."
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+              />
+            </div>
+          </div>
+
+          <div className={styles.footer}>
+            <Button type="submit" variant="primary" loading={loading}>
+              Create and add photos
+            </Button>
+            <span className={styles.footerNote}>
+              You&apos;ll drop photos in on the next screen.
+            </span>
+          </div>
+        </Panel>
+      </form>
+    </>
   );
 }
 

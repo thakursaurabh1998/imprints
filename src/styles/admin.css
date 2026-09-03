@@ -1,0 +1,82 @@
+/*
+ * Admin design tokens.
+ *
+ * The public site is dark (#1f2224 body, #161819 navbar). MUI used to render
+ * its *light* default theme on top of that, which is why admin looked broken.
+ * These tokens extend the site palette rather than inventing a new one.
+ */
+.admin-root {
+  --a-bg: #1f2224;
+  --a-surface: #191c1e;
+  --a-surface-2: #22262a;
+  --a-surface-3: #2a2f34;
+
+  --a-border: rgba(255, 255, 255, 0.09);
+  --a-border-strong: rgba(255, 255, 255, 0.18);
+
+  --a-text: #ecedee;
+  --a-text-muted: #9ea3a7;
+  --a-text-dim: #6b7075;
+
+  --a-accent: #f5a623;
+  --a-accent-hover: #ffb838;
+  --a-accent-ink: #1a1205;
+  --a-accent-soft: rgba(245, 166, 35, 0.14);
+
+  --a-danger: #e5484d;
+  --a-danger-soft: rgba(229, 72, 77, 0.14);
+  --a-success: #3dd68c;
+  --a-success-soft: rgba(61, 214, 140, 0.13);
+
+  --a-radius: 8px;
+  --a-radius-sm: 5px;
+  --a-focus: 0 0 0 3px rgba(245, 166, 35, 0.35);
+
+  --a-font: 'Source Sans Pro', Helvetica, sans-serif;
+  --a-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, monospace;
+
+  /* The site header is fixed to the BOTTOM of the viewport (56px tall), so
+     every admin surface that sticks to the bottom has to clear it. */
+  --a-site-header: 56px;
+  /* Height of the sticky AdminHeader at the top, so anything else that sticks
+     to the top (e.g. the collections table head) can tuck under it instead of
+     behind it. AdminHeader measures itself and overwrites this at runtime —
+     its height is content-driven (badges wrap, the title shrinks on mobile),
+     so a static value is only a first-paint fallback. */
+  --a-admin-header: 76px;
+
+  color: var(--a-text);
+  font-size: 14px;
+  letter-spacing: 0.01em;
+}
+
+.admin-root *,
+.admin-root *::before,
+.admin-root *::after {
+  box-sizing: border-box;
+}
+
+/* globals.css force-sets font-family on body/input/select/textarea with
+   !important but never touches buttons — so buttons need it explicitly. */
+.admin-root button {
+  font-family: var(--a-font);
+  letter-spacing: 0.01em;
+}
+
+.admin-root ::selection {
+  background: var(--a-accent-soft);
+}
+
+.admin-root ::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.admin-root ::-webkit-scrollbar-thumb {
+  background: var(--a-surface-3);
+  border-radius: 10px;
+}
+
+.admin-root ::-webkit-scrollbar-thumb:hover {
+  background: #363b41;
+}

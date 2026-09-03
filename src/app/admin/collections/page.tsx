@@ -1,10 +1,12 @@
 'use client';
 
-import { Button, Grid } from '@mui/material';
 import useSWR from 'swr';
 
-import AdminCard from '@/components/AdminCard';
-import { Collection } from '@/utils/collection-config';
+import AdminHeader from '@/components/AdminHeader';
+import CollectionTable, {
+  AdminCollection,
+} from '@/components/CollectionTable';
+import { Badge, Button, Panel } from '@/components/ui';
 import { hideInProduction } from '@/utils/hide-in-production';
 
 async function fetcher(url: string) {
@@ -20,37 +22,49 @@ async function fetcher(url: string) {
 export default function AdminPanel() {
   hideInProduction();
 
-  const { data: collections } = useSWR<(Collection & { hasDraft: boolean })[]>(
-    '/api/admin',
-    fetcher,
-  );
+  const {
+    data: collections,
+    error,
+    isLoading,
+  } = useSWR<AdminCollection[]>('/api/admin', fetcher);
+
+  const draftCount = collections?.filter((c) => c.hasDraft).length ?? 0;
+  const photoCount =
+    collections?.reduce((total, c) => total + c.pictures.length, 0) ?? 0;
 
   return (
-    <div style={{ padding: 30 }}>
-      <Grid container spacing={2}>
-        <Grid item xs={6}>
-          <h1>Collections</h1>
-        </Grid>
-        <Grid item xs={6} width="100%">
-          <Grid container justifyContent="flex-end">
-            <Button
-              variant="contained"
-              color="primary"
-              href="/admin/collections/new"
-            >
-              NEW COLLECTION
-            </Button>
-          </Grid>
-        </Grid>
-      </Grid>
+    <>
+      <AdminHeader
+        title="Collections"
+        badges={
+          collections && (
+            <>
+              <Badge>{collections.length} collections</Badge>
+              <Badge>{photoCount} photos</Badge>
+              {draftCount > 0 && (
+                <Badge tone="accent" dot>
+                  {draftCount} unpublished
+                </Badge>
+              )}
+            </>
+          )
+        }
+        actions={
+          <Button variant="primary" href="/admin/collections/new">
+            New collection
+          </Button>
+        }
+      />
 
-      <Grid paddingTop={5} container spacing={2} rowSpacing={2}>
-        {collections?.map((collection) => (
-          <Grid item xs={12} sm={6} key={collection.slug}>
-            <AdminCard collection={collection} />
-          </Grid>
-        ))}
-      </Grid>
-    </div>
+      <Panel padded={false}>
+        {error ? (
+          <div style={{ padding: 28, color: '#ff8a8d', fontSize: 13.5 }}>
+            Could not load collections — {error.message}
+          </div>
+        ) : (
+          <CollectionTable collections={collections} loading={isLoading} />
+        )}
+      </Panel>
+    </>
   );
 }

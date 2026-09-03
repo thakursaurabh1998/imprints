@@ -1,0 +1,85 @@
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  /* Clear the fixed publish bar so the last panel is never hidden behind it. */
+  padding-bottom: 96px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+
+.full {
+  grid-column: 1 / -1;
+}
+
+@media (max-width: 640px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/*
+ * Publish bar, pinned above the site header (which is itself fixed to the
+ * bottom of the viewport). Only rendered when there is something to publish,
+ * so it never becomes permanent chrome.
+ *
+ * This is `fixed`, not `sticky`: as the last child of .stack it has no slack
+ * below it inside its containing block, so bottom-sticky had nothing to stick
+ * into and it simply sat off-screen at the end of the document.
+ */
+.publishBar {
+  position: fixed;
+  left: 50%;
+  bottom: calc(var(--a-site-header) + 18px);
+  transform: translateX(-50%);
+  width: min(1124px, calc(100vw - 56px));
+  z-index: 25;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 13px 18px;
+  background: var(--a-surface-2);
+  border: 1px solid var(--a-border-strong);
+  border-radius: var(--a-radius);
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.5);
+}
+
+.publishText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.publishTitle {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--a-text);
+}
+
+.publishHint {
+  font-size: 12px;
+  color: var(--a-text-dim);
+}
+
+.progressTrack {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  overflow: hidden;
+  border-radius: 0 0 var(--a-radius) var(--a-radius);
+  background: var(--a-border);
+}
+
+.progressFill {
+  height: 100%;
+  background: var(--a-accent);
+  transition: width 160ms ease;
+}

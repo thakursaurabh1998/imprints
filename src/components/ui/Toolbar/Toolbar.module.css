@@ -1,0 +1,56 @@
+/*
+ * Floating bar pinned above the site header (which is fixed to the bottom of
+ * the viewport). Only mounted when it has something to say, so it never
+ * becomes permanent chrome stacked on top of the site nav.
+ */
+.toolbar {
+  position: fixed;
+  left: 50%;
+  /* Sits above the publish bar, which occupies site-header + 18px. */
+  bottom: calc(var(--a-site-header) + 96px);
+  transform: translateX(-50%);
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  max-width: calc(100vw - 32px);
+  padding: 11px 16px;
+  background: var(--a-surface-2);
+  border: 1px solid var(--a-border-strong);
+  border-radius: 999px;
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.55);
+  animation: rise 160ms cubic-bezier(0.2, 0.9, 0.3, 1);
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 10px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toolbar {
+    animation: none;
+  }
+}
+
+.label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--a-text);
+  white-space: nowrap;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.divider {
+  width: 1px;
+  height: 20px;
+  background: var(--a-border-strong);
+  flex: none;
+}

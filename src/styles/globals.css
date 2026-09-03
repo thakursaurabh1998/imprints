@@ -8,7 +8,14 @@
 
 html,
 body {
-  overflow-x: hidden;
+  /*
+   * `clip`, not `hidden`. `overflow-x: hidden` forces overflow-y to compute to
+   * `auto`, which makes these scroll containers — and any `position: sticky`
+   * descendant then sticks to a scrollport that never moves, silently killing
+   * sticky app-wide. `clip` clips identically without establishing a scroll
+   * container, so overflow-y stays `visible` and sticky works.
+   */
+  overflow-x: clip;
   max-width: 100vw;
   background-color: #1f2224;
 }

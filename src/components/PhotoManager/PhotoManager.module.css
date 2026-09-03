@@ -1,0 +1,32 @@
+.statusBar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+
+.counts {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-size: 13px;
+  color: var(--a-text-muted);
+}
+
+.spacer {
+  flex: 1;
+}
+
+.selectHint {
+  font-size: 12px;
+  color: var(--a-text-dim);
+}
+
+.empty {
+  padding: 34px 20px;
+  text-align: center;
+  font-size: 13.5px;
+  color: var(--a-text-dim);
+}

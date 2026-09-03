@@ -1,0 +1,16 @@
+.shell {
+  min-height: calc(100vh - var(--a-site-header));
+  background: var(--a-bg);
+}
+
+.container {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 28px 48px;
+}
+
+@media (max-width: 640px) {
+  .container {
+    padding: 0 16px 40px;
+  }
+}

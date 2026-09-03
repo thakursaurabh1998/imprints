@@ -1,0 +1,33 @@
+.form {
+  max-width: 720px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+
+.full {
+  grid-column: 1 / -1;
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid var(--a-border);
+}
+
+.footerNote {
+  font-size: 12.5px;
+  color: var(--a-text-dim);
+}
+
+@media (max-width: 640px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}

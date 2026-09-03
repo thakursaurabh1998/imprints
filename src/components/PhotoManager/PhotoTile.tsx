@@ -1,10 +1,12 @@
-import { Box } from '@mui/material';
 import React from 'react';
 
-import { getPreviewSource, getThumbsFallbackSource } from '@/utils/picture-source';
+import { Spinner } from '@/components/ui';
+import {
+  getPreviewSource,
+  getThumbsFallbackSource,
+} from '@/utils/picture-source';
+import styles from './PhotoTile.module.css';
 import { PictureStatus } from './reducer';
-
-const TILE_SIZE = 200;
 
 type PhotoTileProps = {
   slug: string;
@@ -15,6 +17,8 @@ type PhotoTileProps = {
   isSelected: boolean;
   // eslint-disable-next-line no-unused-vars
   onClick: (e: React.MouseEvent) => void;
+  onRemove: () => void;
+  onSetCover: () => void;
   onRetry?: () => void;
 };
 
@@ -26,37 +30,44 @@ function PhotoTileImpl({
   isCover,
   isSelected,
   onClick,
+  onRemove,
+  onSetCover,
   onRetry,
 }: PhotoTileProps) {
+  const isPending = status === 'queued' || status === 'uploading';
+  const showImage = status === 'ready' || status === 'uploading';
+
   return (
-    <Box
+    <div
+      className={[
+        styles.tile,
+        isSelected && styles.selected,
+        isCover && !isSelected && styles.isCover,
+        isPending && styles.pending,
+        status === 'failed' && styles.failed,
+      ]
+        .filter(Boolean)
+        .join(' ')}
       onClick={onClick}
-      sx={{
-        width: TILE_SIZE,
-        height: TILE_SIZE,
-        position: 'relative',
-        boxSizing: 'border-box',
-        cursor: 'pointer',
-        overflow: 'hidden',
-        bgcolor: '#eee',
-        border: isSelected
-          ? '3px solid #1976d2'
-          : isCover
-            ? '3px solid #f5a623'
-            : '1px solid #ccc',
-        opacity: status === 'queued' || status === 'uploading' ? 0.6 : 1,
+      role="button"
+      tabIndex={0}
+      aria-pressed={isSelected}
+      aria-label={filename}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onClick(e as unknown as React.MouseEvent);
+        }
       }}
     >
-      {status === 'ready' || status === 'uploading' ? (
-        // eslint-disable-next-line @next/next/no-img-element
+      {showImage ? (
+        /* eslint-disable-next-line @next/next/no-img-element */
         <img
+          className={styles.image}
           src={getPreviewSource(slug, filename)}
-          width={TILE_SIZE}
-          height={TILE_SIZE}
-          loading="lazy"
           alt={filename}
+          loading="lazy"
           draggable={false}
-          style={{ objectFit: 'cover', width: '100%', height: '100%' }}
           onError={(e) => {
             const fallback = getThumbsFallbackSource(slug, filename);
             if (e.currentTarget.src.endsWith(fallback)) return;
@@ -64,79 +75,79 @@ function PhotoTileImpl({
           }}
         />
       ) : (
-        <Box
-          sx={{
-            width: '100%',
-            height: '100%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: 12,
-            textAlign: 'center',
-            p: 1,
-          }}
-        >
-          {status === 'failed' ? error || 'Failed' : 'Queued…'}
-        </Box>
+        <div className={styles.placeholder}>
+          {status === 'failed' ? (
+            <>
+              <span className={styles.errorText}>{error || 'Upload failed'}</span>
+              {onRetry && (
+                <button
+                  type="button"
+                  className={styles.action}
+                  style={{ width: 'auto', padding: '0 8px', fontSize: 10.5 }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onRetry();
+                  }}
+                >
+                  Retry
+                </button>
+              )}
+            </>
+          ) : (
+            <>
+              <Spinner size={13} />
+              <span className={styles.placeholderName}>{filename}</span>
+            </>
+          )}
+        </div>
       )}
 
       {status === 'uploading' && (
-        <Box
-          sx={{
-            position: 'absolute',
-            inset: 0,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: 12,
-            bgcolor: 'rgba(0,0,0,0.35)',
-            color: '#fff',
-          }}
-        >
-          Uploading…
-        </Box>
+        <div className={styles.scrim}>
+          <Spinner size={13} />
+          Uploading
+        </div>
       )}
 
-      {isCover && (
-        <Box
-          sx={{
-            position: 'absolute',
-            bottom: 4,
-            right: 4,
-            bgcolor: '#f5a623',
-            color: '#000',
-            fontSize: 10,
-            fontWeight: 700,
-            px: 0.5,
-            borderRadius: 0.5,
-          }}
-        >
-          COVER
-        </Box>
+      {/* Hover actions. Stop propagation so they don't toggle selection. */}
+      {status === 'ready' && (
+        <div className={styles.actions}>
+          {!isCover && (
+            <button
+              type="button"
+              className={`${styles.action} ${styles.actionCover}`}
+              title="Set as cover"
+              aria-label={`Set ${filename} as cover`}
+              onClick={(e) => {
+                e.stopPropagation();
+                onSetCover();
+              }}
+            >
+              ★
+            </button>
+          )}
+          <button
+            type="button"
+            className={`${styles.action} ${styles.actionRemove}`}
+            title="Remove"
+            aria-label={`Remove ${filename}`}
+            onClick={(e) => {
+              e.stopPropagation();
+              onRemove();
+            }}
+          >
+            ✕
+          </button>
+        </div>
       )}
 
-      {status === 'failed' && onRetry && (
-        <Box
-          onClick={(e) => {
-            e.stopPropagation();
-            onRetry();
-          }}
-          sx={{
-            position: 'absolute',
-            bottom: 4,
-            left: 4,
-            bgcolor: '#d32f2f',
-            color: '#fff',
-            fontSize: 10,
-            fontWeight: 700,
-            px: 0.5,
-            borderRadius: 0.5,
-          }}
-        >
-          RETRY
-        </Box>
+      {isCover && <span className={styles.coverBadge}>COVER</span>}
+      {isSelected && (
+        <span className={styles.check} aria-hidden="true">
+          ✓
+        </span>
       )}
-    </Box>
+    </div>
   );
 }
 
