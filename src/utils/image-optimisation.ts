@@ -1,15 +1,29 @@
 import sharp from 'sharp';
 
-function getCompressedImageBuffer(imageBuffer: Buffer, size: number) {
-  return sharp(imageBuffer).rotate().resize({ width: size }).toBuffer();
+const FULL_IMAGE_WIDTH = 2048;
+const THUMBS_IMAGE_WIDTH = 1024;
+const PREVIEW_IMAGE_WIDTH = 320;
+
+export async function getFullAndThumbsImageBuffers(imageBuffer: Buffer) {
+  const pipeline = sharp(imageBuffer).rotate();
+
+  const [full, thumbs] = await Promise.all([
+    pipeline
+      .clone()
+      .resize({ width: FULL_IMAGE_WIDTH, withoutEnlargement: true })
+      .toBuffer(),
+    pipeline
+      .clone()
+      .resize({ width: THUMBS_IMAGE_WIDTH, withoutEnlargement: true })
+      .toBuffer(),
+  ]);
+
+  return { full, thumbs };
 }
 
-export function getFullImageBuffer(imageBuffer: Buffer) {
-  const FULL_IMAGE_WIDTH = 2048;
-  return getCompressedImageBuffer(imageBuffer, FULL_IMAGE_WIDTH);
-}
-
-export function getThumbsImageBuffer(imageBuffer: Buffer) {
-  const FULL_IMAGE_WIDTH = 1024;
-  return getCompressedImageBuffer(imageBuffer, FULL_IMAGE_WIDTH);
+export function getPreviewImageBuffer(imageBuffer: Buffer) {
+  return sharp(imageBuffer)
+    .rotate()
+    .resize({ width: PREVIEW_IMAGE_WIDTH, withoutEnlargement: true })
+    .toBuffer();
 }

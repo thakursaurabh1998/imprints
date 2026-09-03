@@ -1,13 +1,29 @@
 'use client';
 
 import { Button, Grid } from '@mui/material';
+import useSWR from 'swr';
 
 import AdminCard from '@/components/AdminCard';
-import config from '@/config';
+import { Collection } from '@/utils/collection-config';
 import { hideInProduction } from '@/utils/hide-in-production';
+
+async function fetcher(url: string) {
+  const res = await fetch(url);
+
+  if (!res.ok) {
+    throw new Error(`Request to ${url} failed with status ${res.status}`);
+  }
+
+  return res.json();
+}
 
 export default function AdminPanel() {
   hideInProduction();
+
+  const { data: collections } = useSWR<(Collection & { hasDraft: boolean })[]>(
+    '/api/admin',
+    fetcher,
+  );
 
   return (
     <div style={{ padding: 30 }}>
@@ -29,7 +45,7 @@ export default function AdminPanel() {
       </Grid>
 
       <Grid paddingTop={5} container spacing={2} rowSpacing={2}>
-        {config.collections.map((collection) => (
+        {collections?.map((collection) => (
           <Grid item xs={12} sm={6} key={collection.slug}>
             <AdminCard collection={collection} />
           </Grid>

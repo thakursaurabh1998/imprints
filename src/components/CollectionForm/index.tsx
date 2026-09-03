@@ -1,187 +1,181 @@
-import { Button, Grid, Paper, TextField } from '@mui/material';
+import { Button, CircularProgress, Grid, Paper, TextField, Typography } from '@mui/material';
 import { useFormik } from 'formik';
-import Image from 'next/image';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
-import LoaderButton from '@/components/LoaderButton';
-import SortableGrid from '@/components/SortableGrid';
-import UploadDrawer from '@/components/UploadDrawer';
+import PhotoManager, { PhotoManagerPictures } from '@/components/PhotoManager';
 import { Collection } from '@/utils/collection-config';
-import { pushToUniqueList } from '@/utils/deduplicated-list';
-import { getPictureSource } from '@/utils/picture-source';
-import CoverSelectionDrawer from '../CoverSelectionDrawer';
+import { runWithConcurrency } from '@/utils/upload-image';
 
 export default function CollectionForm({
   collection,
   isLoading = false,
-  createMode = false,
   onSubmit,
+  onChange,
 }: {
-  createMode?: boolean;
   collection: Collection;
   isLoading?: boolean;
   // eslint-disable-next-line no-unused-vars
-  onSubmit: (collection: Collection, uploadedFiles: File[]) => void;
+  onSubmit: (collection: Collection) => void;
+  // eslint-disable-next-line no-unused-vars
+  onChange?: (collection: Collection) => void;
 }) {
-  const [uploadModalOpen, setUploadModalOpen] = useState(false);
-  const [coverPictureDrawerOpen, setCoverPictureDrawerOpen] = useState(false);
-  const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
-
   const collectionForm = useFormik({
-    initialValues: collection,
-    onSubmit: (finalCollectionData) =>
-      onSubmit(finalCollectionData, uploadedFiles),
+    initialValues: {
+      title: collection.title,
+      slug: collection.slug,
+      description: collection.description,
+    },
+    onSubmit: () => {},
   });
 
-  function handleDrawerClose(uploadedImages: File[]) {
-    if (createMode) {
-      setUploadedFiles(uploadedImages);
+  const [picturesState, setPicturesState] = useState<PhotoManagerPictures>({
+    pictures: collection.pictures,
+    cover: collection.cover,
+  });
+
+  const [publishing, setPublishing] = useState(false);
+  const [deriveProgress, setDeriveProgress] = useState<{ done: number; total: number } | null>(null);
+
+  const initialCollectionJSON = useRef(
+    JSON.stringify({
+      id: collection.id,
+      title: collection.title,
+      slug: collection.slug,
+      description: collection.description,
+      pictures: collection.pictures,
+      cover: collection.cover,
+    }),
+  );
+
+  const combined: Collection = {
+    id: collection.id,
+    title: collectionForm.values.title,
+    slug: collectionForm.values.slug,
+    description: collectionForm.values.description,
+    pictures: picturesState.pictures,
+    cover: picturesState.cover,
+  };
+
+  const hasChanges = JSON.stringify(combined) !== initialCollectionJSON.current;
+
+  useEffect(() => {
+    if (hasChanges) {
+      onChange?.(combined);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [combined.title, combined.slug, combined.description, combined.pictures, combined.cover]);
+
+  async function handlePublish() {
+    if (!combined.title || !combined.slug || !combined.description) {
+      alert('Title, slug, and description are required.');
+      return;
     }
 
-    const deduplicatedPictures = pushToUniqueList(
-      collectionForm.values.pictures,
-      uploadedImages.map((x) => x.name),
+    if (picturesState.pictures.length === 0) {
+      alert('Add at least one picture before publishing.');
+      return;
+    }
+
+    if (!picturesState.pictures.includes(picturesState.cover)) {
+      alert('Pick a cover photo before publishing.');
+      return;
+    }
+
+    setPublishing(true);
+    setDeriveProgress({ done: 0, total: picturesState.pictures.length });
+
+    const results = await runWithConcurrency(
+      picturesState.pictures,
+      4,
+      async (filename) => {
+        const res = await fetch(`/api/admin/${collection.id}/derive`, {
+          method: 'POST',
+          body: JSON.stringify({ filenames: [filename] }),
+        });
+        const data = await res.json();
+        setDeriveProgress((prev) => (prev ? { done: prev.done + 1, total: prev.total } : prev));
+        return data.results?.[0];
+      },
     );
 
-    collectionForm.setFieldValue('pictures', deduplicatedPictures);
+    await onSubmit(combined);
 
-    setUploadModalOpen(false);
+    setPublishing(false);
+    setDeriveProgress(null);
+
+    const skippedOriginalMissing = results.filter(
+      (r) => r?.status === 'skipped' && r?.reason === 'original missing',
+    );
+
+    if (skippedOriginalMissing.length > 0) {
+      alert(
+        `Published — ${picturesState.pictures.length - skippedOriginalMissing.length} of ${picturesState.pictures.length} images generated. ${skippedOriginalMissing.length} skipped (original missing — legacy collection).`,
+      );
+    } else {
+      alert(`Published — ${picturesState.pictures.length} images generated. Ready to commit.`);
+    }
   }
 
   return (
-    <form onSubmit={collectionForm.handleSubmit}>
-      <Paper sx={{ p: 2 }}>
-        <Grid container spacing={2}>
-          <Grid item xs={6}>
-            <TextField
-              fullWidth
-              id="title"
-              name="title"
-              label="Title"
-              onChange={collectionForm.handleChange}
-              value={collectionForm.values.title}
-            />
-          </Grid>
-          <Grid item xs={6}>
-            <TextField
-              fullWidth
-              id="slug"
-              name="slug"
-              label="Slug"
-              onChange={collectionForm.handleChange}
-              defaultValue={collectionForm.values.slug}
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <TextField
-              fullWidth
-              multiline
-              id="description"
-              name="description"
-              label="Description"
-              onChange={collectionForm.handleChange}
-              defaultValue={collectionForm.values.description}
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <Grid container paddingBottom={1}>
-              <Grid item xs={1} marginY="auto">
-                <h3>Cover</h3>
-              </Grid>
-              <Grid item xs={11}>
-                <CoverSelectionDrawer
-                  slug={collection.slug}
-                  uploadedFiles={uploadedFiles}
-                  createMode={createMode}
-                  pictures={collectionForm.values.pictures}
-                  show={coverPictureDrawerOpen}
-                  onSelect={(coverPicture) => {
-                    if (coverPicture) {
-                      collectionForm.setFieldValue('cover', coverPicture);
-                    }
-                    setCoverPictureDrawerOpen(false);
-                  }}
-                />
-                <Button
-                  variant="outlined"
-                  style={{ marginLeft: 10 }}
-                  onClick={() => setCoverPictureDrawerOpen(true)}
-                >
-                  Select
-                </Button>
-              </Grid>
-            </Grid>
-            {collectionForm.values.cover && (
-              <Image
-                height={200}
-                width={200}
-                quality={20}
-                key={collectionForm.values.cover}
-                src={getPictureSource({
-                  picture: collectionForm.values.cover,
-                  createMode,
-                  uploadedFiles,
-                  slug: collection.slug,
-                })}
-                alt={collectionForm.values.cover}
-              />
-            )}
-          </Grid>
-          <Grid item xs={12}>
-            <Grid container paddingBottom={1}>
-              <Grid item xs={1} marginY="auto">
-                <h3>Pictures</h3>
-              </Grid>
-              <Grid item xs={11}>
-                <UploadDrawer
-                  createMode={createMode}
-                  collectionId={collection.id}
-                  show={uploadModalOpen}
-                  handleClose={handleDrawerClose}
-                />
-                <Button
-                  variant="outlined"
-                  style={{ marginLeft: 10 }}
-                  onClick={() => setUploadModalOpen(true)}
-                >
-                  Upload
-                </Button>
-              </Grid>
-            </Grid>
-            <SortableGrid
-              items={collectionForm.values.pictures.map((picture) => ({
-                id: picture,
-                itemNode: (
-                  <Image
-                    height={200}
-                    width={200}
-                    quality={20}
-                    key={picture}
-                    src={getPictureSource({
-                      picture,
-                      createMode,
-                      uploadedFiles,
-                      slug: collection.slug,
-                    })}
-                    alt={picture}
-                  />
-                ),
-              }))}
-              onChange={(items) =>
-                collectionForm.setFieldValue(
-                  'pictures',
-                  items.map((item) => item.id),
-                )
-              }
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <LoaderButton loading={isLoading}>
-              {createMode ? 'Create' : 'Update'}
-            </LoaderButton>
-          </Grid>
+    <Paper sx={{ p: 2 }}>
+      <Grid container spacing={2}>
+        <Grid item xs={6}>
+          <TextField
+            fullWidth
+            id="title"
+            name="title"
+            label="Title"
+            onChange={collectionForm.handleChange}
+            value={collectionForm.values.title}
+          />
         </Grid>
-      </Paper>
-    </form>
+        <Grid item xs={6}>
+          <TextField
+            fullWidth
+            id="slug"
+            name="slug"
+            label="Slug"
+            onChange={collectionForm.handleChange}
+            value={collectionForm.values.slug}
+          />
+        </Grid>
+        <Grid item xs={12}>
+          <TextField
+            fullWidth
+            multiline
+            id="description"
+            name="description"
+            label="Description"
+            onChange={collectionForm.handleChange}
+            value={collectionForm.values.description}
+          />
+        </Grid>
+        <Grid item xs={12}>
+          <Typography variant="h6" sx={{ mb: 1 }}>
+            Pictures
+          </Typography>
+          <PhotoManager
+            collectionId={collection.id}
+            slug={collectionForm.values.slug}
+            initialPictures={collection.pictures}
+            initialCover={collection.cover}
+            onChange={setPicturesState}
+          />
+        </Grid>
+        <Grid item xs={12}>
+          <Button
+            variant="contained"
+            color="primary"
+            disabled={isLoading || publishing || !hasChanges}
+            onClick={handlePublish}
+            endIcon={isLoading || publishing ? <CircularProgress size={15} /> : null}
+          >
+            {publishing && deriveProgress
+              ? `Publishing ${deriveProgress.done} of ${deriveProgress.total}`
+              : 'Publish'}
+          </Button>
+        </Grid>
+      </Grid>
+    </Paper>
   );
 }

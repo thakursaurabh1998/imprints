@@ -8,10 +8,16 @@ import {
   Chip,
   Typography,
 } from '@mui/material';
+import { SyntheticEvent } from 'react';
 
 import { Collection } from '@/utils/collection-config';
+import { getPreviewSource, getThumbsFallbackSource } from '@/utils/picture-source';
 
-export default function AdminCard({ collection }: { collection: Collection }) {
+export default function AdminCard({
+  collection,
+}: {
+  collection: Collection & { hasDraft?: boolean };
+}) {
   return (
     <Card sx={{ display: 'flex' }} style={{ height: '100%' }}>
       <Box sx={{ display: 'flex', flexDirection: 'column' }}>
@@ -23,6 +29,13 @@ export default function AdminCard({ collection }: { collection: Collection }) {
               style={{ marginBottom: 5, marginLeft: 20 }}
               label={<code>/{collection.slug}</code>}
             />
+            {collection.hasDraft && (
+              <Chip
+                color="warning"
+                style={{ marginBottom: 5, marginLeft: 10 }}
+                label="Unpublished changes"
+              />
+            )}
           </Typography>
 
           <Typography variant="body2" color="text.secondary" component="p">
@@ -44,12 +57,19 @@ export default function AdminCard({ collection }: { collection: Collection }) {
           </CardActions>
         </Box>
       </Box>
-      <CardMedia
-        component="img"
-        sx={{ width: 200 }}
-        image={`/original/images/${collection.slug}/${collection.cover}`}
-        alt={`Cover image for ${collection.title}`}
-      />
+      {collection.cover && (
+        <CardMedia
+          component="img"
+          sx={{ width: 200 }}
+          image={getPreviewSource(collection.slug, collection.cover)}
+          alt={`Cover image for ${collection.title}`}
+          onError={(e: SyntheticEvent<HTMLImageElement>) => {
+            const fallback = getThumbsFallbackSource(collection.slug, collection.cover);
+            if (e.currentTarget.src.endsWith(fallback)) return;
+            e.currentTarget.src = fallback;
+          }}
+        />
+      )}
     </Card>
   );
 }

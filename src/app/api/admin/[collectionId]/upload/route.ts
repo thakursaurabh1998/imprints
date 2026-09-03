@@ -1,45 +1,63 @@
+import path from 'path';
+
 import { NextRequest, NextResponse } from 'next/server';
 
-import { updateCollectionsAndWriteToJson } from '@/utils/collection-config';
-import { getCollectionMetaById } from '@/utils/collection-meta';
-import { saveAllImageVariations } from '@/utils/save-image';
+import { getCollectionById } from '@/utils/collection-config';
+import { IS_PRODUCTION } from '@/utils/constants';
+import { deleteUploadedImage, saveUploadedImage } from '@/utils/save-image';
 
-// NOTE: We are only uploading 1 image at a time
-// so in case of multiple upload api calls, a race condition
-// in reading and updating the collections file can occur leading to
-// data loss. The client should always upload 1 by 1.
+const ALLOWED_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+const REJECTED_MIME_TYPES = ['image/heic', 'image/heif'];
+
 export async function POST(
   req: NextRequest,
   context: { params: { collectionId: string } },
 ) {
-  const { collectionId } = context.params;
-
-  const image = await req.formData();
-
-  const imageFile = image.get('file') as File;
-
-  if (!imageFile) {
-    return new Response('Image not parsable', { status: 500 });
+  if (IS_PRODUCTION) {
+    return new Response('Not available in production', { status: 403 });
   }
 
-  const collection = getCollectionMetaById(collectionId);
+  const { collectionId } = context.params;
+
+  const formData = await req.formData();
+  const imageFile = formData.get('file') as File | null;
+
+  if (!imageFile) {
+    return new Response('Image not parsable', { status: 400 });
+  }
+
+  const filename = path.basename(imageFile.name);
+
+  if (REJECTED_MIME_TYPES.includes(imageFile.type)) {
+    return new Response('HEIC not supported — convert to JPEG first', {
+      status: 415,
+    });
+  }
+
+  if (!ALLOWED_MIME_TYPES.includes(imageFile.type)) {
+    return new Response(`Unsupported file type: ${imageFile.type}`, {
+      status: 415,
+    });
+  }
+
+  const collection = await getCollectionById(collectionId);
 
   if (!collection) {
     return new Response('Collection not found!', { status: 404 });
   }
 
+  const relativeFilePath = `${collection.slug}/${filename}`;
   const imageBuffer = Buffer.from(await imageFile.arrayBuffer());
 
-  await saveAllImageVariations({
-    relativeFilePath: `${collection?.slug}/${imageFile.name}`,
-    buffer: imageBuffer,
-  });
-
-  if (!collection.pictures.includes(imageFile.name)) {
-    collection.pictures.push(imageFile.name);
+  try {
+    await saveUploadedImage({ relativeFilePath, buffer: imageBuffer });
+  } catch {
+    await deleteUploadedImage({ relativeFilePath });
+    return new Response(
+      "Couldn't process image — is it a supported format?",
+      { status: 415 },
+    );
   }
 
-  await updateCollectionsAndWriteToJson(collectionId, collection);
-
-  return NextResponse.json({ abc: 'Image file uploaded successfully' });
+  return NextResponse.json({ filename });
 }

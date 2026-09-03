@@ -9,9 +9,9 @@ import {
 export async function POST(req: NextRequest) {
   const body: Collection = await req.json();
 
-  const { cover, description, id, pictures, slug, title } = body;
+  const { description, id, slug, title } = body;
 
-  if (!cover || !description || !id || !pictures || !slug || !title) {
+  if (!description || !id || !slug || !title) {
     return new Response('Missing required fields!', { status: 400 });
   }
 

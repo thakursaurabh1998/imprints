@@ -1,21 +1,7 @@
-export function getPictureSource({
-  createMode,
-  picture,
-  uploadedFiles,
-  slug,
-}: {
-  picture: string;
-  createMode: boolean;
-  uploadedFiles: File[];
-  slug: string;
-}) {
-  if (createMode) {
-    const imageFile = uploadedFiles.find((x) => x.name === picture);
+export function getPreviewSource(slug: string, filename: string) {
+  return `/original/previews/${slug}/${filename}`;
+}
 
-    if (!imageFile) return '';
-
-    return URL.createObjectURL(imageFile);
-  }
-
-  return `/original/images/${slug}/${picture}`;
+export function getThumbsFallbackSource(slug: string, filename: string) {
+  return `/images/thumbs/${slug}/${filename}`;
 }
