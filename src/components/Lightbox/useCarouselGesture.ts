@@ -84,6 +84,15 @@ export function useCarouselGesture({
   latest.current = { canGoPrev, canGoNext, onNavigate, onDismiss };
 
   const didDragRef = useRef(false);
+  // Holds the in-flight animation's own finish() while one is pending, so a
+  // new animateTo() call can force it to complete synchronously first.
+  // Without this, a second commit fired before the first settles (e.g. the
+  // user tapping "next" twice quickly) leaves two transitionend/fallback
+  // listeners on the same track element — both can fire off one event, each
+  // resetting the transform and advancing the index, and since that DOM
+  // reset happens before React re-renders with the new slide classnames,
+  // the stale slide flashes at the reset position for a frame.
+  const activeAnimationRef = useRef<(() => void) | null>(null);
 
   const setTrackStyle = useCallback(
     (dx: number, dy: number, opacity: number, scale: number, transition: string) => {
@@ -111,6 +120,12 @@ export function useCarouselGesture({
       scale: number,
       onDone?: () => void,
     ) => {
+      // Force any still-pending animation to complete synchronously before
+      // starting a new one, so its listeners are always cleaned up and its
+      // index update always applied before this call touches the track.
+      activeAnimationRef.current?.();
+      activeAnimationRef.current = null;
+
       const track = trackRef.current;
       // A backgrounded/hidden tab (or a user's reduced-motion preference)
       // won't reliably animate — worse, on a hidden tab Chrome throttles
@@ -140,6 +155,9 @@ export function useCarouselGesture({
         track.removeEventListener('transitionend', finish);
         document.removeEventListener('visibilitychange', handleVisibilityChange);
         window.clearTimeout(fallbackTimer);
+        if (activeAnimationRef.current === finish) {
+          activeAnimationRef.current = null;
+        }
         onDone?.();
       };
 
@@ -156,6 +174,7 @@ export function useCarouselGesture({
       track.addEventListener('transitionend', finish);
       document.addEventListener('visibilitychange', handleVisibilityChange);
       const fallbackTimer = window.setTimeout(finish, SNAP_DURATION_MS + 50);
+      activeAnimationRef.current = finish;
 
       setTrackStyle(dx, dy, opacity, scale, transition);
     },
