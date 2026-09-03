@@ -24,9 +24,19 @@ export async function getCollections() {
   return collections;
 }
 
+export async function getCollectionById(id: string) {
+  const collections = await getCollections();
+  return collections.find((c) => c.id === id) ?? null;
+}
+
 export async function updateCollections(id: string, collection: Collection) {
   const collections = await getCollections();
   const collectionIndex = collections.findIndex((c) => c.id === id);
+
+  if (collectionIndex === -1) {
+    throw new Error(`Collection with id "${id}" not found`);
+  }
+
   collections[collectionIndex] = collection;
 
   return collections;
