@@ -11,7 +11,7 @@ const DERIVE_CONCURRENCY = 4;
 
 const MIN_COLUMNS = 2;
 const MAX_COLUMNS = 6;
-const DEFAULT_COLUMNS = 3;
+const DEFAULT_COLUMNS = 4;
 
 export default function CollectionForm({
   collection,
