@@ -1,55 +1,70 @@
 'use client';
 
-import { Global } from '@emotion/react';
-import { Paper } from '@mui/material';
-import SwipeableDrawer from '@mui/material/SwipeableDrawer';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import Description from '@/components/Description';
 import Header from '@/components/Header';
+import { useScrollLock } from '@/components/Lightbox/useScrollLock';
+import styles from './HeaderDrawer.module.css';
 
 export default function HeaderDrawer() {
   const [open, setOpen] = useState(false);
-
-  const toggleDrawer = (newOpen: boolean) => () => {
-    setOpen(newOpen);
-  };
+  const openDrawer = () => setOpen(true);
 
   return (
     <>
-      <Paper
-        elevation={4}
-        sx={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 9 }}
-      >
-        <Header openDrawer={toggleDrawer(true)} />
-      </Paper>
-      <Global
-        styles={{
-          '.MuiDrawer-root > .MuiPaper-root': {
-            maxHeight: '50%',
-            overflow: 'scroll',
-          },
-        }}
-      />
-      <SwipeableDrawer
-        anchor="bottom"
-        open={open}
-        onClose={toggleDrawer(false)}
-        onOpen={toggleDrawer(true)}
-        swipeAreaWidth={0}
-        disableSwipeToOpen={true}
-        ModalProps={{
-          keepMounted: true,
-        }}
-      >
-        {/* The following div is added to maintain the height
-        of the header when the drawer is in opened state but I
-        don't understand why do I need to add a div here */}
-        <div>
-          <Header openDrawer={toggleDrawer(true)} />
-        </div>
-        <Description />
-      </SwipeableDrawer>
+      <div className={styles.bar}>
+        <Header openDrawer={openDrawer} />
+      </div>
+
+      {open && (
+        <DrawerSheet openDrawer={openDrawer} onClose={() => setOpen(false)} />
+      )}
     </>
+  );
+}
+
+function DrawerSheet({
+  openDrawer,
+  onClose,
+}: {
+  openDrawer: () => void;
+  onClose: () => void;
+}) {
+  const [visible, setVisible] = useState(false);
+  const sheetRef = useRef<HTMLDivElement>(null);
+
+  useScrollLock({ containerRef: sheetRef });
+
+  useEffect(() => {
+    const raf = requestAnimationFrame(() => setVisible(true));
+    return () => cancelAnimationFrame(raf);
+  }, []);
+
+  useEffect(() => {
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === 'Escape') onClose();
+    }
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [onClose]);
+
+  return (
+    <div className={styles.overlay}>
+      <div
+        className={`${styles.backdrop} ${visible ? styles.visible : ''}`}
+        onClick={onClose}
+      />
+      <div
+        ref={sheetRef}
+        className={`${styles.sheet} ${visible ? styles.open : ''}`}
+        role="dialog"
+        aria-modal="true"
+        aria-label="About"
+      >
+        <Header openDrawer={openDrawer} />
+        <Description />
+      </div>
+    </div>
   );
 }

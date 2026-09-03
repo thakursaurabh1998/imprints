@@ -1,14 +1,35 @@
 .collection-card {
   background-color: #161819;
+  cursor: pointer;
+}
+
+.cover {
+  display: block;
+  width: 100%;
+}
+
+.content {
+  /* #photos sets line-height: 0 to keep the masonry grid gap-free; that
+     inherits into card text unless reset here, collapsing title/description
+     line boxes to zero height. */
+  line-height: 1.4;
+  padding: 16px;
 }
 
 .collection-title {
+  margin: 0 0 8px;
+  font-size: 1.25em;
+}
+
+.collection-title a {
   color: #d7d7d7;
   font-weight: 600;
   letter-spacing: 0.035em;
+  text-decoration: none;
 }
 
 .collection-description {
+  margin: 0;
   color: #a0a0a1;
   font-weight: 100;
   letter-spacing: 0.025em;
