@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 
-import CarouselModal from '@/components/CarouselModal';
+import Lightbox from '@/components/Lightbox';
 import { Collection } from '@/utils/collection-config';
+import { getThumbsSource } from '@/utils/picture-source';
 import styles from './PhotoGrid.module.css';
 
 interface PhotoGridProps {
@@ -11,12 +12,15 @@ interface PhotoGridProps {
 }
 
 export default function PhotoGrid({ collection }: PhotoGridProps) {
-  const [showCarousel, setShowCarousel] = useState(false);
+  const [showLightbox, setShowLightbox] = useState(false);
   const [clickedImage, setClickedImage] = useState(0);
+  const thumbRefs = useRef<Record<number, HTMLImageElement | null>>({});
+  const returnFocusRef = useRef<HTMLImageElement | null>(null);
 
   function handleClickOnImage(index: number) {
+    returnFocusRef.current = thumbRefs.current[index] ?? null;
     setClickedImage(index);
-    setShowCarousel(true);
+    setShowLightbox(true);
   }
 
   return (
@@ -26,21 +30,36 @@ export default function PhotoGrid({ collection }: PhotoGridProps) {
           {collection.pictures.map((image, index) => (
             <img
               key={image}
-              src={`/images/thumbs/${collection.slug}/${image}`}
-              alt={image}
+              ref={(el) => {
+                thumbRefs.current[index] = el;
+              }}
+              src={getThumbsSource(collection.slug, image)}
+              alt={`${collection.title} — photo ${index + 1}`}
+              loading="lazy"
+              decoding="async"
+              tabIndex={0}
+              role="button"
               onClick={() => handleClickOnImage(index)}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                  event.preventDefault();
+                  handleClickOnImage(index);
+                }
+              }}
             />
           ))}
         </section>
       </div>
 
-      <CarouselModal
-        show={showCarousel}
-        handleClose={() => setShowCarousel(false)}
-        openedImage={clickedImage}
-        slug={collection.slug}
-        images={collection.pictures}
-      />
+      {showLightbox && (
+        <Lightbox
+          slug={collection.slug}
+          pictures={collection.pictures}
+          initialIndex={clickedImage}
+          onClose={() => setShowLightbox(false)}
+          returnFocusRef={returnFocusRef}
+        />
+      )}
     </>
   );
 }

@@ -3,6 +3,7 @@ import { Metadata } from 'next';
 import PhotoCard from '@/components/PhotoCard';
 import photogridStyles from '@/components/PhotoGrid/PhotoGrid.module.css';
 import config from '@/config';
+import { getThumbsSource } from '@/utils/picture-source';
 
 export const metadata: Metadata = {
   title: config.title,
@@ -20,7 +21,7 @@ export default function Home() {
               title={collection.title}
               slug={collection.slug}
               description={collection.description}
-              cover={`/images/thumbs/${collection.slug}/${collection.cover}`}
+              cover={getThumbsSource(collection.slug, collection.cover)}
             />
           </div>
         ))}

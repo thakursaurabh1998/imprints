@@ -1,11 +1,8 @@
 'use client';
 
-import { CardActionArea } from '@mui/material';
-import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
-import CardMedia from '@mui/material/CardMedia';
-import Typography from '@mui/material/Typography';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import React from 'react';
 
 import styles from './PhotoCard.module.css';
 
@@ -24,43 +21,23 @@ export default function PhotoCard({
 }: PhotoCardProps) {
   const router = useRouter();
 
+  function handleCardClick(event: React.MouseEvent<HTMLElement>) {
+    if ((event.target as HTMLElement).closest('a')) return;
+    router.push(`/collection/${slug}`);
+  }
+
   return (
-    <Card
-      onClick={() => router.push(`/collection/${slug}`)}
-      style={{ backgroundColor: '#161819' }}
+    <article
+      onClick={handleCardClick}
       className={styles['collection-card']}
     >
-      <CardActionArea>
-        <CardMedia component="img" image={cover} alt={title} />
-        <CardContent>
-          <Typography
-            variant="h6"
-            className={styles['collection-title']}
-            fontFamily="Source Sans Pro"
-            gutterBottom
-            style={{
-              color: '#d7d7d7',
-              fontWeight: 600,
-              letterSpacing: '0.035em',
-            }}
-          >
-            {title.toUpperCase()}
-          </Typography>
-          <Typography
-            variant="body2"
-            color="text.secondary"
-            fontFamily="Source Sans Pro"
-            className={styles['collection-description']}
-            style={{
-              color: '#a0a0a1',
-              fontWeight: 100,
-              letterSpacing: '0.025em',
-            }}
-          >
-            {description}
-          </Typography>
-        </CardContent>
-      </CardActionArea>
-    </Card>
+      <img src={cover} alt={title} className={styles.cover} />
+      <div className={styles.content}>
+        <h3 className={styles['collection-title']}>
+          <Link href={`/collection/${slug}`}>{title.toUpperCase()}</Link>
+        </h3>
+        <p className={styles['collection-description']}>{description}</p>
+      </div>
+    </article>
   );
 }

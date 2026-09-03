@@ -1,4 +1,4 @@
-import { Grid, Link } from '@mui/material';
+import Link from 'next/link';
 
 import config from '@/config';
 import { IS_PRODUCTION } from '@/utils/constants';
@@ -11,38 +11,26 @@ interface HeaderProps {
 export default function Header({ openDrawer }: HeaderProps) {
   return (
     <div id={styles.navbar}>
-      <Grid
-        container
-        alignItems="center"
-        justifyContent="start"
-        direction="row"
-        display="flex"
-      >
-        <Grid item xs={10}>
-          <span id={styles.title}>
-            <Link href="/" underline="none">
-              <strong>{config.header.title.toUpperCase()}</strong>&nbsp;
-              {config.header.subtitle.toUpperCase()}
-            </Link>
-          </span>
-        </Grid>
-        <Grid item xs={2}>
-          <Grid container justifyContent="end" direction="row" display="flex">
-            {!IS_PRODUCTION && (
-              <span id={styles.about} style={{ marginRight: 50 }}>
-                <Link href="/admin/collections" underline="none">
-                  ADMIN
-                </Link>
-              </span>
-            )}
-            <span id={styles.about}>
-              <Link onClick={openDrawer} underline="none">
-                ABOUT
-              </Link>
+      <div className={styles.row}>
+        <span id={styles.title}>
+          <Link href="/">
+            <strong>{config.header.title.toUpperCase()}</strong>&nbsp;
+            {config.header.subtitle.toUpperCase()}
+          </Link>
+        </span>
+        <div className={styles.actions}>
+          {!IS_PRODUCTION && (
+            <span id={styles.about} className={styles['admin-link']}>
+              <Link href="/admin/collections">ADMIN</Link>
             </span>
-          </Grid>
-        </Grid>
-      </Grid>
+          )}
+          <span id={styles.about}>
+            <button type="button" onClick={openDrawer}>
+              ABOUT
+            </button>
+          </span>
+        </div>
+      </div>
     </div>
   );
 }

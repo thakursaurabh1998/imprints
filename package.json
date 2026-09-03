@@ -11,15 +11,11 @@
   "dependencies": {
     "@dnd-kit/core": "^6.0.8",
     "@dnd-kit/sortable": "^7.0.2",
-    "@emotion/react": "^11.10.6",
-    "@emotion/styled": "^11.10.6",
-    "@mui/material": "^5.11.13",
     "formik": "^2.4.3",
     "next": "^13.4.12",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "sharp": "^0.32.4",
-    "swiper": "^9.1.1",
     "swr": "^2.2.0",
     "uuid": "^9.0.0"
   },
