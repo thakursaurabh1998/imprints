@@ -118,6 +118,7 @@ export default function CollectionSet({
       <CollectionForm
         isLoading={loading}
         collection={mergedCollection}
+        baseline={collection}
         onSubmit={handleFormData}
         onChange={saveDraft}
       />

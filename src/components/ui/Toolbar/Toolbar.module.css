@@ -6,7 +6,8 @@
 .toolbar {
   position: fixed;
   left: 50%;
-  bottom: calc(var(--a-site-header) + 18px);
+  /* Sits above the publish bar, which occupies site-header + 18px. */
+  bottom: calc(var(--a-site-header) + 96px);
   transform: translateX(-50%);
   z-index: 30;
   display: flex;

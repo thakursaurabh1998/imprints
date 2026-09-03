@@ -11,11 +11,20 @@ const DERIVE_CONCURRENCY = 4;
 
 export default function CollectionForm({
   collection,
+  baseline,
   isLoading = false,
   onSubmit,
   onChange,
 }: {
+  /** Values to edit — the published collection with any draft overlaid. */
   collection: Collection;
+  /**
+   * The last *published* state, used purely for change detection. Without
+   * this, reloading a page that has a draft on disk would baseline against
+   * the draft itself, making `hasChanges` false and hiding the publish bar —
+   * leaving no way to publish the draft short of making a throwaway edit.
+   */
+  baseline?: Collection;
   isLoading?: boolean;
   // eslint-disable-next-line no-unused-vars
   onSubmit: (collection: Collection) => void;
@@ -45,14 +54,7 @@ export default function CollectionForm({
   } | null>(null);
 
   const initialCollectionJSON = useRef(
-    JSON.stringify({
-      id: collection.id,
-      title: collection.title,
-      slug: collection.slug,
-      description: collection.description,
-      pictures: collection.pictures,
-      cover: collection.cover,
-    }),
+    JSON.stringify(serialise(baseline ?? collection)),
   );
 
   const combined: Collection = {
@@ -64,7 +66,8 @@ export default function CollectionForm({
     cover: picturesState.cover,
   };
 
-  const hasChanges = JSON.stringify(combined) !== initialCollectionJSON.current;
+  const hasChanges =
+    JSON.stringify(serialise(combined)) !== initialCollectionJSON.current;
 
   useEffect(() => {
     if (hasChanges) {
@@ -133,7 +136,7 @@ export default function CollectionForm({
 
       // Re-baseline, or `hasChanges` stays true and the publish bar keeps
       // claiming there are unpublished changes after a successful publish.
-      initialCollectionJSON.current = JSON.stringify(combined);
+      initialCollectionJSON.current = JSON.stringify(serialise(combined));
 
       const skipped = results.filter(
         (r) => r?.status === 'skipped' && r?.reason === 'original missing',
@@ -249,4 +252,16 @@ export default function CollectionForm({
       )}
     </div>
   );
+}
+
+/** Stable key order, so change detection never trips on field ordering. */
+function serialise(collection: Collection) {
+  return {
+    id: collection.id,
+    title: collection.title,
+    slug: collection.slug,
+    description: collection.description,
+    pictures: collection.pictures,
+    cover: collection.cover,
+  };
 }
