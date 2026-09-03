@@ -38,6 +38,12 @@
   /* The site header is fixed to the BOTTOM of the viewport (56px tall), so
      every admin surface that sticks to the bottom has to clear it. */
   --a-site-header: 56px;
+  /* Height of the sticky AdminHeader at the top, so anything else that sticks
+     to the top (e.g. the collections table head) can tuck under it instead of
+     behind it. AdminHeader measures itself and overwrites this at runtime —
+     its height is content-driven (badges wrap, the title shrinks on mobile),
+     so a static value is only a first-paint fallback. */
+  --a-admin-header: 76px;
 
   color: var(--a-text);
   font-size: 14px;

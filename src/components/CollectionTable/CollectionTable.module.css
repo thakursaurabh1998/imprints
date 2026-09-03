@@ -1,5 +1,11 @@
+/*
+ * No `overflow` here on purpose. `overflow-x: auto` computes overflow-y to
+ * `auto` as well, which makes this a scroll container and stops the sticky
+ * table head from sticking to the viewport. Narrow screens are handled by
+ * dropping the description column instead (see the media query below).
+ */
 .wrap {
-  overflow-x: auto;
+  position: relative;
 }
 
 .table {
@@ -8,15 +14,53 @@
   border-spacing: 0;
 }
 
-.table th {
-  padding: 0 14px 11px;
-  font-size: 11px;
+/*
+ * Header band. Previously this had `padding: 0 14px 11px` — no top padding at
+ * all — so the labels sat jammed against the panel's top border, and with no
+ * background or bottom border of its own the row read as floating text rather
+ * than a header (the rule beneath it was really the first row's border-top).
+ */
+.table thead th {
+  position: sticky;
+  /* Tuck directly under the sticky AdminHeader rather than behind it. */
+  top: calc(var(--a-admin-header) - 1px);
+  z-index: 2;
+  padding: 11px 14px;
+  background: var(--a-surface-2);
+  border-bottom: 1px solid var(--a-border-strong);
+  font-size: 10.5px;
   font-weight: 700;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.11em;
   text-transform: uppercase;
   text-align: left;
-  color: var(--a-text-dim);
+  color: var(--a-text-muted);
   white-space: nowrap;
+}
+
+/* Match the panel's rounding, inset by its 1px border. */
+.table thead th:first-child {
+  border-top-left-radius: calc(var(--a-radius) - 1px);
+}
+
+.table thead th:last-child {
+  border-top-right-radius: calc(var(--a-radius) - 1px);
+}
+
+/* Numeric column: right-aligned so counts line up on their last digit. */
+.numeric {
+  text-align: right !important;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
 }
 
 .row {
@@ -31,6 +75,10 @@
   padding: 12px 14px;
   border-top: 1px solid var(--a-border);
   vertical-align: middle;
+}
+
+.row:first-child td {
+  border-top: none;
 }
 
 .row:hover .actions {
@@ -100,10 +148,16 @@
 }
 
 .count {
+  display: block;
   font-family: var(--a-mono);
   font-size: 13px;
   color: var(--a-text-muted);
   white-space: nowrap;
+  text-align: right;
+}
+
+.countCell {
+  width: 1%;
 }
 
 .actionsCell {
@@ -185,5 +239,16 @@
   .description,
   .descriptionHead {
     display: none;
+  }
+
+  /*
+   * Restore horizontal scrolling once columns get tight. This makes .wrap a
+   * scroll container, which disables the sticky head — a fair trade at phone
+   * widths, where the pinned page header still gives context and being able
+   * to reach the Edit button matters more. Without this the table would be
+   * silently clipped by `overflow-x: clip` on html/body.
+   */
+  .wrap {
+    overflow-x: auto;
   }
 }

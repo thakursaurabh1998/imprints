@@ -89,13 +89,21 @@ export default function CollectionTable({
       <table className={styles.table}>
         <thead>
           <tr>
-            <th scope="col" aria-label="Cover" />
+            {/* Visually-hidden text rather than aria-label on an empty <th>:
+                screen readers treat an empty labelled cell inconsistently. */}
+            <th scope="col" className={styles.coverCell}>
+              <span className={styles.srOnly}>Cover</span>
+            </th>
             <th scope="col">Collection</th>
             <th scope="col" className={styles.descriptionHead}>
               Description
             </th>
-            <th scope="col">Photos</th>
-            <th scope="col" aria-label="Actions" />
+            <th scope="col" className={`${styles.countCell} ${styles.numeric}`}>
+              Photos
+            </th>
+            <th scope="col" className={styles.actionsCell}>
+              <span className={styles.srOnly}>Actions</span>
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -128,7 +136,7 @@ export default function CollectionTable({
                   </div>
                 </td>
 
-                <td>
+                <td className={styles.countCell}>
                   <span className={styles.count}>
                     {collection.pictures.length}
                   </span>
