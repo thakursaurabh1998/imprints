@@ -1,5 +1,10 @@
 export const IS_PRODUCTION = process.env.NODE_ENV === 'production';
-export const ORIGINAL_IMAGE_DIRECTORY = './public/original/images';
+// Full-resolution uploads. Read server-side by sharp during publish and never
+// fetched by URL, so they live outside public/ — otherwise `next build` would
+// copy every original into out/, and a local build+deploy would publish them.
+export const ORIGINAL_IMAGE_DIRECTORY = './.admin-scratch/originals';
+// Previews are the one piece of scratch the browser DOES fetch (the admin
+// grid renders them), so they have to stay under public/ to be served.
 export const PREVIEW_IMAGE_DIRECTORY = './public/original/previews';
 // Drafts and trash are only ever read server-side through the admin API, so
 // they must NOT live under public/ — `next build` copies all of public/ into
