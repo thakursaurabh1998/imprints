@@ -24,10 +24,15 @@ type SortableItemType = { id: UniqueIdentifier; itemNode: React.ReactNode };
 
 type SortableGridProps = {
   items: SortableItemType[];
+  columns: number;
   onChange: (updatedPictures: SortableItemType[]) => void;
 };
 
-export default function SortableGrid({ items, onChange }: SortableGridProps) {
+export default function SortableGrid({
+  items,
+  columns,
+  onChange,
+}: SortableGridProps) {
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
@@ -53,7 +58,10 @@ export default function SortableGrid({ items, onChange }: SortableGridProps) {
       onDragEnd={handleDragEnd}
     >
       <SortableContext items={items}>
-        <div className={styles.grid}>
+        <div
+          className={styles.grid}
+          style={{ gridTemplateColumns: `repeat(${columns}, 1fr)` }}
+        >
           {items.map((item) => (
             <SortableItem key={item.id} id={item.id}>
               {item.itemNode}
