@@ -28,12 +28,14 @@ export default function PhotoManager({
   slug,
   initialPictures,
   initialCover,
+  columns,
   onChange,
 }: {
   collectionId: string;
   slug: string;
   initialPictures: string[];
   initialCover: string;
+  columns: number;
   // eslint-disable-next-line no-unused-vars
   onChange: (pictures: PhotoManagerPictures) => void;
 }) {
@@ -274,6 +276,7 @@ export default function PhotoManager({
       ) : (
         <SortableGrid
           items={items}
+          columns={columns}
           onChange={(updated) =>
             dispatch({
               type: 'reorder',

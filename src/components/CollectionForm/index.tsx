@@ -2,12 +2,16 @@ import { useFormik } from 'formik';
 import { useEffect, useRef, useState } from 'react';
 
 import PhotoManager, { PhotoManagerPictures } from '@/components/PhotoManager';
-import { Button, Input, Panel, Textarea, useToast } from '@/components/ui';
+import { Button, Input, Textarea, useToast } from '@/components/ui';
 import { Collection } from '@/utils/collection-config';
 import { runWithConcurrency } from '@/utils/upload-image';
 import styles from './CollectionForm.module.css';
 
 const DERIVE_CONCURRENCY = 4;
+
+const MIN_COLUMNS = 2;
+const MAX_COLUMNS = 6;
+const DEFAULT_COLUMNS = 4;
 
 export default function CollectionForm({
   collection,
@@ -46,6 +50,8 @@ export default function CollectionForm({
     pictures: collection.pictures,
     cover: collection.cover,
   });
+
+  const [columns, setColumns] = useState(DEFAULT_COLUMNS);
 
   const [publishing, setPublishing] = useState(false);
   const [deriveProgress, setDeriveProgress] = useState<{
@@ -172,45 +178,55 @@ export default function CollectionForm({
 
   return (
     <div className={styles.stack}>
-      <Panel title="Details">
-        <div className={styles.grid}>
-          <Input
-            label="Title"
-            id="title"
-            name="title"
-            onChange={collectionForm.handleChange}
-            value={collectionForm.values.title}
-          />
-          <Input
-            label="Slug"
-            id="slug"
-            name="slug"
-            mono
-            hint="URL and image folder name"
-            onChange={collectionForm.handleChange}
-            value={collectionForm.values.slug}
-          />
-          <div className={styles.full}>
-            <Textarea
-              label="Description"
-              id="description"
-              name="description"
+      <div className={styles.columns}>
+        <div className={styles.detailsCol}>
+          <h2 className={styles.sectionTitle}>Details</h2>
+          <div className={styles.grid}>
+            <Input
+              label="Title"
+              id="title"
+              name="title"
               onChange={collectionForm.handleChange}
-              value={collectionForm.values.description}
+              value={collectionForm.values.title}
+            />
+            <Input
+              label="Slug"
+              id="slug"
+              name="slug"
+              mono
+              hint="URL and image folder name"
+              onChange={collectionForm.handleChange}
+              value={collectionForm.values.slug}
+            />
+            <div className={styles.full}>
+              <Textarea
+                label="Description"
+                id="description"
+                name="description"
+                onChange={collectionForm.handleChange}
+                value={collectionForm.values.description}
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className={styles.photosCol}>
+          <div className={styles.photosHeader}>
+            <h2 className={styles.sectionTitle}>Photos</h2>
+            <ColumnsControl value={columns} onChange={setColumns} />
+          </div>
+          <div className={styles.photosBody}>
+            <PhotoManager
+              collectionId={collection.id}
+              slug={collectionForm.values.slug}
+              initialPictures={collection.pictures}
+              initialCover={collection.cover}
+              columns={columns}
+              onChange={setPicturesState}
             />
           </div>
         </div>
-      </Panel>
-
-      <Panel title="Photos">
-        <PhotoManager
-          collectionId={collection.id}
-          slug={collectionForm.values.slug}
-          initialPictures={collection.pictures}
-          initialCover={collection.cover}
-          onChange={setPicturesState}
-        />
-      </Panel>
+      </div>
 
       {hasChanges && (
         <div className={styles.publishBar}>
@@ -250,6 +266,40 @@ export default function CollectionForm({
           )}
         </div>
       )}
+    </div>
+  );
+}
+
+function ColumnsControl({
+  value,
+  onChange,
+}: {
+  value: number;
+  // eslint-disable-next-line no-unused-vars
+  onChange: (next: number) => void;
+}) {
+  return (
+    <div className={styles.columnsControl}>
+      <span className={styles.columnsLabel}>Columns</span>
+      <Button
+        size="icon"
+        variant="ghost"
+        disabled={value <= MIN_COLUMNS}
+        onClick={() => onChange(Math.max(MIN_COLUMNS, value - 1))}
+        aria-label="Fewer columns"
+      >
+        −
+      </Button>
+      <span className={styles.columnsValue}>{value}</span>
+      <Button
+        size="icon"
+        variant="ghost"
+        disabled={value >= MAX_COLUMNS}
+        onClick={() => onChange(Math.min(MAX_COLUMNS, value + 1))}
+        aria-label="More columns"
+      >
+        +
+      </Button>
     </div>
   );
 }

@@ -1,12 +1,13 @@
+/* grid-template-columns is set inline from the columns control; this is only
+   the first-paint fallback before that style is applied. */
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(132px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 10px;
 }
 
 @media (max-width: 640px) {
   .grid {
-    grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
     gap: 7px;
   }
 }
