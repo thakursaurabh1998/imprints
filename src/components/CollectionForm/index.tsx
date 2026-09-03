@@ -218,7 +218,18 @@ export default function CollectionForm({
           <div className={styles.photosBody}>
             <PhotoManager
               collectionId={collection.id}
-              slug={collectionForm.values.slug}
+              /*
+               * The PUBLISHED slug, not the live form value.
+               *
+               * Preview URLs have to match where the server actually wrote the
+               * files, and the upload route resolves its path from
+               * collections.json on disk. Using the form value meant that editing
+               * the slug (or a draft holding an unpublished one) pointed every
+               * preview at a directory that doesn't exist — previews 404'd, and on
+               * a new collection there are no committed thumbs to fall back to
+               * either, so every tile rendered empty with just its alt text.
+               */
+              slug={(baseline ?? collection).slug}
               initialPictures={collection.pictures}
               initialCover={collection.cover}
               columns={columns}
@@ -226,28 +237,7 @@ export default function CollectionForm({
             />
           </div>
         </div>
-      </Panel>
-
-      <Panel title="Photos">
-        <PhotoManager
-          collectionId={collection.id}
-          /*
-           * The PUBLISHED slug, not the live form value.
-           *
-           * Preview URLs have to match where the server actually wrote the
-           * files, and the upload route resolves its path from
-           * collections.json on disk. Using the form value meant that editing
-           * the slug (or a draft holding an unpublished one) pointed every
-           * preview at a directory that doesn't exist — previews 404'd, and on
-           * a new collection there are no committed thumbs to fall back to
-           * either, so every tile rendered empty with just its alt text.
-           */
-          slug={(baseline ?? collection).slug}
-          initialPictures={collection.pictures}
-          initialCover={collection.cover}
-          onChange={setPicturesState}
-        />
-      </Panel>
+      </div>
 
       {hasChanges && (
         <div className={styles.publishBar}>
