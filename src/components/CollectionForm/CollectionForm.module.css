@@ -5,11 +5,12 @@
 }
 
 /*
- * Bounded so this row exactly fills what's left of .shell's own
- * viewport-derived height below the sticky AdminHeader and above
- * .container's own bottom clearance — reaching all the way down to just
- * above the fixed site footer, with no leftover gap. If it falls short of
- * that, nothing looks broken; if it overshoots, .shell gains scrollable
+ * Open layout: no panel boxes, just two columns of content separated by a
+ * hairline divider. Bounded so this row exactly fills what's left of
+ * .shell's own viewport-derived height below the sticky AdminHeader and
+ * above .container's own bottom clearance — reaching all the way down to
+ * just above the fixed site footer, with no leftover gap. If it falls short
+ * of that, nothing looks broken; if it overshoots, .shell gains scrollable
  * overflow and wheeling over Details (which has nothing to scroll
  * internally, see .detailsCol) bubbles straight up and scrolls the whole
  * page instead of doing nothing.
@@ -25,29 +26,53 @@
 .columns {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 20px;
+  gap: 0;
   align-items: stretch;
   height: calc(100vh - var(--a-admin-header) - 135px);
 }
 
+.sectionTitle {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  color: var(--a-text-dim);
+}
+
 .detailsCol {
+  padding-right: 40px;
   overflow-y: auto;
 }
 
+.detailsCol .sectionTitle {
+  margin-bottom: 18px;
+}
+
 /*
- * Split the panel into a fixed header (title + columns control) and a
- * scrolling body, so the Photos heading and its controls stay put while the
- * grid underneath scrolls. Targets Panel's own content wrapper structurally
- * (it's the only <div> after the <header>) rather than reaching into Panel's
- * CSS module.
+ * A fixed header (title + columns control) and a scrolling body below it, so
+ * the Photos heading and its controls stay put while the grid underneath
+ * scrolls.
  */
 .photosCol {
   display: flex;
   flex-direction: column;
+  padding-left: 40px;
+  border-left: 1px solid var(--a-border);
   overflow: hidden;
 }
 
-.photosCol > div:last-child {
+.photosHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding-bottom: 14px;
+  margin-bottom: 14px;
+  border-bottom: 1px solid var(--a-border);
+}
+
+.photosBody {
   flex: 1;
   min-height: 0;
   overflow-y: auto;
@@ -101,15 +126,19 @@
   }
 
   .detailsCol {
+    padding-right: 0;
+    padding-bottom: 32px;
     overflow: visible;
   }
 
   .photosCol {
     display: block;
+    padding-left: 0;
+    border-left: none;
     overflow: visible;
   }
 
-  .photosCol > div:last-child {
+  .photosBody {
     overflow: visible;
   }
 

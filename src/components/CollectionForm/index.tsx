@@ -2,7 +2,7 @@ import { useFormik } from 'formik';
 import { useEffect, useRef, useState } from 'react';
 
 import PhotoManager, { PhotoManagerPictures } from '@/components/PhotoManager';
-import { Button, Input, Panel, Textarea, useToast } from '@/components/ui';
+import { Button, Input, Textarea, useToast } from '@/components/ui';
 import { Collection } from '@/utils/collection-config';
 import { runWithConcurrency } from '@/utils/upload-image';
 import styles from './CollectionForm.module.css';
@@ -179,7 +179,8 @@ export default function CollectionForm({
   return (
     <div className={styles.stack}>
       <div className={styles.columns}>
-        <Panel title="Details" className={styles.detailsCol}>
+        <div className={styles.detailsCol}>
+          <h2 className={styles.sectionTitle}>Details</h2>
           <div className={styles.grid}>
             <Input
               label="Title"
@@ -207,22 +208,24 @@ export default function CollectionForm({
               />
             </div>
           </div>
-        </Panel>
+        </div>
 
-        <Panel
-          title="Photos"
-          className={styles.photosCol}
-          actions={<ColumnsControl value={columns} onChange={setColumns} />}
-        >
-          <PhotoManager
-            collectionId={collection.id}
-            slug={collectionForm.values.slug}
-            initialPictures={collection.pictures}
-            initialCover={collection.cover}
-            columns={columns}
-            onChange={setPicturesState}
-          />
-        </Panel>
+        <div className={styles.photosCol}>
+          <div className={styles.photosHeader}>
+            <h2 className={styles.sectionTitle}>Photos</h2>
+            <ColumnsControl value={columns} onChange={setColumns} />
+          </div>
+          <div className={styles.photosBody}>
+            <PhotoManager
+              collectionId={collection.id}
+              slug={collectionForm.values.slug}
+              initialPictures={collection.pictures}
+              initialCover={collection.cover}
+              columns={columns}
+              onChange={setPicturesState}
+            />
+          </div>
+        </div>
       </div>
 
       {hasChanges && (
