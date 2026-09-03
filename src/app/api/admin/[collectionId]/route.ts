@@ -2,10 +2,23 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import {
   Collection,
+  getCollectionById,
   renameDirectoriesUsingSlug,
   updateCollectionsAndWriteToJson,
 } from '@/utils/collection-config';
-import { getCollectionMetaById } from '@/utils/collection-meta';
+
+export async function GET(
+  req: NextRequest,
+  context: { params: { collectionId: string } },
+) {
+  const collection = await getCollectionById(context.params.collectionId);
+
+  if (!collection) {
+    return new Response('Collection not found!', { status: 404 });
+  }
+
+  return NextResponse.json(collection);
+}
 
 export async function PUT(
   req: NextRequest,
@@ -14,7 +27,7 @@ export async function PUT(
   const { collectionId } = context.params;
   const data: Collection = await req.json();
 
-  const currentData = getCollectionMetaById(collectionId);
+  const currentData = await getCollectionById(collectionId);
 
   if (!currentData) {
     return new Response('Collection not found!', { status: 404 });
