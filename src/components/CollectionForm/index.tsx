@@ -1,7 +1,7 @@
 import { Button, Grid, Paper, TextField } from '@mui/material';
 import { useFormik } from 'formik';
 import Image from 'next/image';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import LoaderButton from '@/components/LoaderButton';
 import SortableGrid from '@/components/SortableGrid';
@@ -16,12 +16,15 @@ export default function CollectionForm({
   isLoading = false,
   createMode = false,
   onSubmit,
+  onChange,
 }: {
   createMode?: boolean;
   collection: Collection;
   isLoading?: boolean;
   // eslint-disable-next-line no-unused-vars
   onSubmit: (collection: Collection, uploadedFiles: File[]) => void;
+  // eslint-disable-next-line no-unused-vars
+  onChange?: (collection: Collection) => void;
 }) {
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
   const [coverPictureDrawerOpen, setCoverPictureDrawerOpen] = useState(false);
@@ -32,6 +35,18 @@ export default function CollectionForm({
     onSubmit: (finalCollectionData) =>
       onSubmit(finalCollectionData, uploadedFiles),
   });
+
+  // Compared by value (not "is this the first effect call") because React's
+  // dev-mode Strict Mode double-invokes effects on mount with the same
+  // unchanged values — an order-based mount guard sees that phantom second
+  // call and mistakes it for a real edit, autosaving a draft nobody made.
+  const initialValuesJSON = useRef(JSON.stringify(collection));
+
+  useEffect(() => {
+    if (JSON.stringify(collectionForm.values) !== initialValuesJSON.current) {
+      onChange?.(collectionForm.values);
+    }
+  }, [collectionForm.values, onChange]);
 
   function handleDrawerClose(uploadedImages: File[]) {
     if (createMode) {

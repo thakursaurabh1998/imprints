@@ -1,45 +1,47 @@
 'use client';
 
-import { Grid, Typography } from '@mui/material';
+import { Grid, Paper, TextField, Typography } from '@mui/material';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
-import { useSWRConfig } from 'swr';
+import { FormEvent, useState } from 'react';
 import useSWRMutation from 'swr/mutation';
 import { v4 as uuid } from 'uuid';
 
-import CollectionForm from '@/components/CollectionForm';
+import LoaderButton from '@/components/LoaderButton';
 import { Collection } from '@/utils/collection-config';
-import { uploadImage } from '@/utils/upload-image';
+import { hideInProduction } from '@/utils/hide-in-production';
 
 export default function NewCollection() {
+  hideInProduction();
+
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [id] = useState(() => uuid());
+  const [title, setTitle] = useState('');
+  const [slug, setSlug] = useState('');
+  const [description, setDescription] = useState('');
 
-  const { mutate } = useSWRConfig();
   const { trigger } = useSWRMutation('/api/admin/new', createCollection);
 
-  const handleFormData = async (
-    collectionData: Collection,
-    uploadedFiles: File[],
-  ) => {
+  async function handleSubmit(e: FormEvent) {
+    e.preventDefault();
     setLoading(true);
-    await trigger(collectionData, {
-      onSuccess({ ok }) {
-        if (ok) {
-          router.replace('/admin/collections');
-        } else {
-          alert('Collection creation failed!');
-        }
-      },
+
+    const res = await trigger({
+      id,
+      title,
+      slug,
+      description,
+      cover: '',
+      pictures: [],
     });
 
-    for (const picture of uploadedFiles) {
-      await mutate(
-        `/api/admin/new`,
-        uploadImage(`/api/admin/${collectionData.id}/upload`, { arg: picture }),
-      );
+    if (res?.ok) {
+      router.replace(`/admin/collections/${id}/edit`);
+    } else {
+      alert('Collection creation failed!');
+      setLoading(false);
     }
-  };
+  }
 
   return (
     <Grid
@@ -53,25 +55,46 @@ export default function NewCollection() {
         <Typography variant="h2">New Collection</Typography>
       </Grid>
       <Grid item sm={12} md={9}>
-        <CollectionForm
-          createMode
-          isLoading={loading}
-          collection={{
-            title: '',
-            slug: '',
-            pictures: [],
-            description: '',
-            cover: '',
-            id: uuid(),
-          }}
-          onSubmit={handleFormData}
-        />
+        <form onSubmit={handleSubmit}>
+          <Paper sx={{ p: 2 }}>
+            <Grid container spacing={2}>
+              <Grid item xs={6}>
+                <TextField
+                  fullWidth
+                  label="Title"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                />
+              </Grid>
+              <Grid item xs={6}>
+                <TextField
+                  fullWidth
+                  label="Slug"
+                  value={slug}
+                  onChange={(e) => setSlug(e.target.value)}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  multiline
+                  label="Description"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <LoaderButton loading={loading}>Create</LoaderButton>
+              </Grid>
+            </Grid>
+          </Paper>
+        </form>
       </Grid>
     </Grid>
   );
 }
 
-function createCollection(url: string, { arg }: { arg: Collection }) {
+function createCollection(url: string, { arg }: { arg: Partial<Collection> }) {
   return fetch(url, {
     method: 'POST',
     body: JSON.stringify(arg),

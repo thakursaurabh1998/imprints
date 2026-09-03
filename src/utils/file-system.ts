@@ -13,7 +13,13 @@ export async function readJSONFile(filePath: string) {
   return JSON.parse(file);
 }
 
-export function writeJSONFile(filePath: string, data: any) {
+export async function writeJSONFile(filePath: string, data: any) {
+  const directoryPath = getDirectory(filePath);
+
+  if (!(await directoryExists(directoryPath))) {
+    await createDirectory(directoryPath);
+  }
+
   const file = JSON.stringify(data, null, 2);
   return fs.writeFile(filePath, file);
 }
