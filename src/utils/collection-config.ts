@@ -1,9 +1,15 @@
 import {
   FULL_IMAGE_DIRECTORY,
   ORIGINAL_IMAGE_DIRECTORY,
+  PREVIEW_IMAGE_DIRECTORY,
   THUMBS_IMAGE_DIRECTORY,
 } from './constants';
-import { readJSONFile, renameDirectory, writeJSONFile } from './file-system';
+import {
+  directoryExists,
+  readJSONFile,
+  renameDirectory,
+  writeJSONFile,
+} from './file-system';
 
 export type Collection = {
   id: string;
@@ -60,18 +66,33 @@ export async function renameDirectoriesUsingSlug(
   oldSlug: string,
   newSlug: string,
 ) {
-  const originalImagesPath = (slug: string) =>
-    `${ORIGINAL_IMAGE_DIRECTORY}/${slug}`;
-  const thumbsImagesPath = (slug: string) =>
-    `${THUMBS_IMAGE_DIRECTORY}/${slug}`;
-  const fullImagesPath = (slug: string) => `${FULL_IMAGE_DIRECTORY}/${slug}`;
+  /*
+   * Every per-slug directory has to move together. PREVIEW was previously
+   * missing here, so renaming a slug orphaned the 320px previews under the old
+   * name — every admin tile then 404'd and silently fell back to the committed
+   * thumbs.
+   *
+   * Each rename is also skipped when the source doesn't exist, rather than
+   * throwing. A slug edited before publishing has no thumbs/full yet, and an
+   * unguarded fs.rename threw ENOENT part-way through — leaving originals
+   * renamed but derivatives not, i.e. exactly the split state this is meant to
+   * avoid.
+   */
+  const directories = [
+    ORIGINAL_IMAGE_DIRECTORY,
+    PREVIEW_IMAGE_DIRECTORY,
+    THUMBS_IMAGE_DIRECTORY,
+    FULL_IMAGE_DIRECTORY,
+  ];
 
-  await renameDirectory(
-    originalImagesPath(oldSlug),
-    originalImagesPath(newSlug),
+  await Promise.all(
+    directories.map(async (directory) => {
+      const from = `${directory}/${oldSlug}`;
+      const to = `${directory}/${newSlug}`;
+
+      if (!(await directoryExists(from))) return;
+
+      await renameDirectory(from, to);
+    }),
   );
-
-  await renameDirectory(thumbsImagesPath(oldSlug), thumbsImagesPath(newSlug));
-
-  await renameDirectory(fullImagesPath(oldSlug), fullImagesPath(newSlug));
 }
