@@ -4,6 +4,7 @@ import React, {
   RefObject,
   useCallback,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from 'react';
@@ -45,10 +46,12 @@ export default function Lightbox({
   const canGoPrev = index > 0;
   const canGoNext = index < pictures.length - 1;
 
+  const fadeRefs = useMemo(() => [backdropRef, chromeRef], []);
+
   const { triggerPrev, triggerNext, didDragRef } = useCarouselGesture({
     stageRef,
     trackRef,
-    fadeRefs: [backdropRef, chromeRef],
+    fadeRefs,
     canGoPrev,
     canGoNext,
     onNavigate: (direction) =>
@@ -56,6 +59,7 @@ export default function Lightbox({
         Math.min(Math.max(current + direction, 0), pictures.length - 1),
       ),
     onDismiss: onClose,
+    ready: portalReady,
   });
 
   useScrollLock({ containerRef: dialogRef, returnFocusRef });

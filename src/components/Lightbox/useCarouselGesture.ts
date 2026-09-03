@@ -2,11 +2,21 @@
 
 import { RefObject, useCallback, useEffect, useRef } from 'react';
 
-const AXIS_LOCK_THRESHOLD_PX = 10;
+const AXIS_LOCK_THRESHOLD_PX = 12;
+// Horizontal swipe-to-navigate is the primary gesture; vertical dismiss is
+// secondary. Real swipes (touch/trackpad) rarely move in a perfectly
+// straight line, so a near-diagonal drag should resolve to horizontal —
+// only lock to vertical when it's clearly the dominant axis.
+const AXIS_LOCK_VERTICAL_BIAS = 1.4;
 const HORIZONTAL_DISTANCE_RATIO = 0.25;
 const HORIZONTAL_VELOCITY_THRESHOLD = 0.4; // px/ms
 const VERTICAL_DISTANCE_RATIO = 0.15;
 const VERTICAL_VELOCITY_THRESHOLD = 0.4; // px/ms
+// A tiny movement can still register a huge instantaneous velocity (sensor
+// noise, or the first sample after touchdown) — require a minimum distance
+// before a "fast flick" alone can commit, so a jitter can't be mistaken for
+// an intentional flick.
+const MIN_FLICK_DISTANCE_PX = 30;
 const VELOCITY_SAMPLE_WINDOW_MS = 100;
 const EDGE_RESISTANCE = 0.35;
 const SNAP_DURATION_MS = 260;
@@ -29,6 +39,12 @@ interface UseCarouselGestureOptions {
   // eslint-disable-next-line no-unused-vars
   onNavigate: (direction: 1 | -1) => void;
   onDismiss: () => void;
+  // Lightbox renders null until its portal target exists, so stageRef.current
+  // is still null on the commit where this hook's effects first run. Refs
+  // don't participate in React's dependency comparison, so the effect below
+  // needs an explicit signal (flips once the real DOM mounts) to know it
+  // should try attaching listeners again.
+  ready: boolean;
 }
 
 function prefersReducedMotion() {
@@ -62,6 +78,7 @@ export function useCarouselGesture({
   canGoNext,
   onNavigate,
   onDismiss,
+  ready,
 }: UseCarouselGestureOptions) {
   const latest = useRef({ canGoPrev, canGoNext, onNavigate, onDismiss });
   latest.current = { canGoPrev, canGoNext, onNavigate, onDismiss };
@@ -199,7 +216,8 @@ export function useCarouselGesture({
         if (Math.abs(dx) < AXIS_LOCK_THRESHOLD_PX && Math.abs(dy) < AXIS_LOCK_THRESHOLD_PX) {
           return;
         }
-        state.axis = Math.abs(dx) > Math.abs(dy) ? 'x' : 'y';
+        state.axis =
+          Math.abs(dy) > Math.abs(dx) * AXIS_LOCK_VERTICAL_BIAS ? 'y' : 'x';
         didDragRef.current = true;
       }
 
@@ -246,7 +264,8 @@ export function useCarouselGesture({
         const distanceRatio = Math.abs(dx) / width;
         const wantsCommit =
           distanceRatio > HORIZONTAL_DISTANCE_RATIO ||
-          Math.abs(velocityX) > HORIZONTAL_VELOCITY_THRESHOLD;
+          (Math.abs(dx) > MIN_FLICK_DISTANCE_PX &&
+            Math.abs(velocityX) > HORIZONTAL_VELOCITY_THRESHOLD);
         const direction: 1 | -1 = dx < 0 ? 1 : -1;
         const blocked = direction === 1 ? !latest.current.canGoNext : !latest.current.canGoPrev;
 
@@ -259,7 +278,9 @@ export function useCarouselGesture({
         const height = stage.clientHeight || window.innerHeight;
         const distanceRatio = dy / height;
         const wantsDismiss =
-          dy > 0 && (distanceRatio > VERTICAL_DISTANCE_RATIO || velocityY > VERTICAL_VELOCITY_THRESHOLD);
+          dy > 0 &&
+          (distanceRatio > VERTICAL_DISTANCE_RATIO ||
+            (dy > MIN_FLICK_DISTANCE_PX && velocityY > VERTICAL_VELOCITY_THRESHOLD));
 
         if (wantsDismiss) {
           commitDismiss();
@@ -293,7 +314,7 @@ export function useCarouselGesture({
       stage.removeEventListener('pointercancel', handlePointerCancel);
       stage.removeEventListener('lostpointercapture', handlePointerCancel);
     };
-  }, [stageRef, setTrackStyle, commitNavigate, commitDismiss, settleToIdentity]);
+  }, [ready, stageRef, setTrackStyle, commitNavigate, commitDismiss, settleToIdentity]);
 
   return { triggerPrev, triggerNext, didDragRef };
 }
