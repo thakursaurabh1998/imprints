@@ -1,4 +1,4 @@
-import { Metadata } from 'next';
+import { Metadata, Viewport } from 'next';
 
 import PhotoCard from '@/components/PhotoCard';
 import photogridStyles from '@/components/PhotoGrid/PhotoGrid.module.css';
@@ -8,7 +8,11 @@ import { getThumbsSource } from '@/utils/picture-source';
 export const metadata: Metadata = {
   title: config.title,
   description: config.subtitle,
-  viewport: 'width=device-width, initial-scale=1',
+};
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
 };
 
 export default function Home() {
