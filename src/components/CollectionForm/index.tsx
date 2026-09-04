@@ -14,6 +14,18 @@ const MIN_COLUMNS = 2;
 const MAX_COLUMNS = 6;
 const DEFAULT_COLUMNS = 4;
 
+// Mirrors src/utils/publish-commit.ts's CommitAndPushResult, duplicated
+// locally so this client component never imports that server-only module.
+type CommitResult =
+  | { status: 'nothing-to-commit'; branch: string }
+  | {
+      status: 'committed';
+      branch: string;
+      commitSha: string;
+      reused: boolean;
+      compareUrl: string | null;
+    };
+
 export default function CollectionForm({
   collection,
   baseline,
@@ -59,6 +71,11 @@ export default function CollectionForm({
     done: number;
     total: number;
   } | null>(null);
+
+  const [committing, setCommitting] = useState(false);
+  const [lastCommitResult, setLastCommitResult] = useState<CommitResult | null>(
+    null,
+  );
 
   const initialCollectionJSON = useRef(
     JSON.stringify(serialise(baseline ?? collection)),
@@ -116,6 +133,9 @@ export default function CollectionForm({
 
     setPublishing(true);
     setDeriveProgress({ done: 0, total });
+    // A stale link from before this publish would point at content that no
+    // longer matches what's on disk.
+    setLastCommitResult(null);
 
     try {
       // Derive BEFORE writing the manifest, so a failure part-way can never
@@ -154,7 +174,9 @@ export default function CollectionForm({
 
       if (skipped.length > 0) {
         toast.show(
-          `Published — ${total - skipped.length} of ${total} images generated. ` +
+          `Published — ${
+            total - skipped.length
+          } of ${total} images generated. ` +
             `${skipped.length} skipped because the original is missing (legacy collection). ` +
             `Ready to commit.`,
           'warning',
@@ -178,7 +200,50 @@ export default function CollectionForm({
     setDeriveProgress(null);
   }
 
-  const busy = isLoading || publishing;
+  async function handleCommit() {
+    setCommitting(true);
+
+    try {
+      const res = await fetch(`/api/admin/${collection.id}/commit`, {
+        method: 'POST',
+      });
+
+      if (!res.ok) throw new Error(await res.text());
+
+      const data: CommitResult = await res.json();
+      setLastCommitResult(data);
+
+      if (data.status === 'nothing-to-commit') {
+        toast.show(
+          `Already up to date — nothing new on ${data.branch}.`,
+          'info',
+        );
+      } else if (data.compareUrl) {
+        toast.show(
+          data.reused
+            ? `Pushed another commit to ${data.branch}.`
+            : `Pushed ${data.branch}. Ready to open a PR.`,
+          'success',
+        );
+      } else {
+        toast.show(
+          `Pushed ${data.branch} — open a PR manually for that branch on GitHub (couldn't build a direct link).`,
+          'warning',
+        );
+      }
+    } catch (err) {
+      toast.show(
+        `Commit failed — ${
+          err instanceof Error ? err.message : 'unknown error'
+        }.`,
+        'error',
+      );
+    }
+
+    setCommitting(false);
+  }
+
+  const busy = isLoading || publishing || committing;
 
   return (
     <div className={styles.stack}>
@@ -279,6 +344,39 @@ export default function CollectionForm({
               />
             </div>
           )}
+        </div>
+      )}
+
+      {!hasChanges && (
+        <div className={styles.commitBar}>
+          <div className={styles.publishText}>
+            <span className={styles.publishTitle}>Version control</span>
+            <span className={styles.publishHint}>
+              Commits collections.json and the images for this collection to a
+              collection/{combined.slug} branch, then pushes it to origin.
+            </span>
+          </div>
+
+          <Button
+            variant="secondary"
+            loading={committing}
+            disabled={busy}
+            onClick={handleCommit}
+          >
+            {committing ? 'Committing' : 'Commit & push'}
+          </Button>
+
+          {lastCommitResult?.status === 'committed' &&
+            lastCommitResult.compareUrl && (
+              <Button
+                variant="ghost"
+                href={lastCommitResult.compareUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Create PR →
+              </Button>
+            )}
         </div>
       )}
     </div>

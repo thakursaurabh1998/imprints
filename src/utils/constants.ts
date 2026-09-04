@@ -15,3 +15,7 @@ export const DRAFT_DIRECTORY = './.admin-scratch/drafts';
 export const TRASH_DIRECTORY = './.admin-scratch/trash';
 export const THUMBS_IMAGE_DIRECTORY = './public/images/thumbs';
 export const FULL_IMAGE_DIRECTORY = './public/images/full';
+// The branch the deploy workflow watches (.github/workflows/nextjs.yml) —
+// never commit/push directly here from the admin dashboard.
+export const BASE_BRANCH = 'main';
+export const COLLECTION_BRANCH_PREFIX = 'collection/';

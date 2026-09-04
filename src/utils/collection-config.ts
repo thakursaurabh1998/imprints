@@ -20,7 +20,7 @@ export type Collection = {
   pictures: string[];
 };
 
-const COLLECTION_JSON_FILE_PATH = './public/resource/collections.json';
+export const COLLECTION_JSON_FILE_PATH = './public/resource/collections.json';
 
 export async function getCollections() {
   const collections: Collection[] = await readJSONFile(
@@ -107,7 +107,9 @@ export async function renameDirectoriesUsingSlug(
    * way to hit it is leftovers from a discarded collection that used the
    * target slug.
    */
-  const blocked = moves.filter((move) => move.sourceExists && move.targetExists);
+  const blocked = moves.filter(
+    (move) => move.sourceExists && move.targetExists,
+  );
 
   if (blocked.length > 0) {
     throw new Error(
