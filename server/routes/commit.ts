@@ -1,28 +1,24 @@
-import { NextRequest, NextResponse } from 'next/server';
-
-import { IS_PRODUCTION } from '@/utils/constants';
-import { GitCommandError } from '@/utils/git';
-import { withGitLock } from '@/utils/git-lock';
+import { IS_PRODUCTION } from '../../src/utils/constants';
+import { GitCommandError } from '../../src/utils/git';
+import { withGitLock } from '../../src/utils/git-lock';
 import {
   CollectionNotFoundError,
   commitCollectionAndPush,
-} from '@/utils/publish-commit';
+} from '../../src/utils/publish-commit';
 
-export async function POST(
-  req: NextRequest,
-  context: { params: { collectionId: string } },
-) {
+export async function commitCollection(
+  req: Request,
+  params: { collectionId: string },
+): Promise<Response> {
   if (IS_PRODUCTION) {
     return new Response('Not available in production', { status: 403 });
   }
 
-  const { collectionId } = context.params;
-
   try {
     const result = await withGitLock(() =>
-      commitCollectionAndPush(collectionId),
+      commitCollectionAndPush(params.collectionId),
     );
-    return NextResponse.json(result);
+    return Response.json(result);
   } catch (err) {
     return mapErrorToResponse(err);
   }
@@ -42,7 +38,7 @@ function mapErrorToResponse(err: unknown): Response {
         );
       case 'WRONG_REPO_ROOT':
         return new Response(
-          "The dev server's working directory doesn't match the git repo root — restart it from the repo root.",
+          "The admin server's working directory doesn't match the git repo root — restart it from the repo root.",
           { status: 500 },
         );
       case 'NO_ORIGIN_REMOTE':
