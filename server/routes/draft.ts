@@ -1,16 +1,9 @@
-import { Collection } from '../../src/utils/collection-config';
-import { DRAFT_DIRECTORY, IS_PRODUCTION } from '../../src/utils/constants';
 import {
-  deleteFileIfExists,
-  fileExists,
-  readJSONFile,
-  writeJSONFile,
-} from '../../src/utils/file-system';
-
-export type CollectionDraft = Pick<
-  Collection,
-  'title' | 'slug' | 'description' | 'cover' | 'pictures'
->;
+  CollectionDraft,
+  getCollectionDraft,
+} from '../../src/utils/collection-config';
+import { DRAFT_DIRECTORY, IS_PRODUCTION } from '../../src/utils/constants';
+import { deleteFileIfExists, writeJSONFile } from '../../src/utils/file-system';
 
 function draftPath(collectionId: string) {
   return `${DRAFT_DIRECTORY}/${collectionId}.json`;
@@ -20,13 +13,7 @@ export async function getDraft(
   req: Request,
   params: { collectionId: string },
 ): Promise<Response> {
-  const filePath = draftPath(params.collectionId);
-
-  if (!(await fileExists(filePath))) {
-    return Response.json(null);
-  }
-
-  const draft = await readJSONFile(filePath);
+  const draft = await getCollectionDraft(params.collectionId);
   return Response.json(draft);
 }
 

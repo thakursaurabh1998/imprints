@@ -1,4 +1,5 @@
 import {
+  DRAFT_DIRECTORY,
   FULL_IMAGE_DIRECTORY,
   ORIGINAL_IMAGE_DIRECTORY,
   PREVIEW_IMAGE_DIRECTORY,
@@ -6,6 +7,7 @@ import {
 } from './constants';
 import {
   directoryExists,
+  fileExists,
   readJSONFile,
   renameDirectory,
   writeJSONFile,
@@ -20,7 +22,26 @@ export type Collection = {
   pictures: string[];
 };
 
+export type CollectionDraft = Pick<
+  Collection,
+  'title' | 'slug' | 'description' | 'cover' | 'pictures'
+>;
+
 export const COLLECTION_JSON_FILE_PATH = './public/resource/collections.json';
+
+function draftPath(collectionId: string) {
+  return `${DRAFT_DIRECTORY}/${collectionId}.json`;
+}
+
+export async function getCollectionDraft(
+  collectionId: string,
+): Promise<CollectionDraft | null> {
+  const filePath = draftPath(collectionId);
+
+  if (!(await fileExists(filePath))) return null;
+
+  return readJSONFile(filePath);
+}
 
 export async function getCollections() {
   const collections: Collection[] = await readJSONFile(
