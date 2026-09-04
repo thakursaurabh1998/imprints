@@ -32,6 +32,7 @@ export default function CollectionForm({
   isLoading = false,
   onSubmit,
   onChange,
+  onUndo,
 }: {
   /** Values to edit — the published collection with any draft overlaid. */
   collection: Collection;
@@ -47,6 +48,8 @@ export default function CollectionForm({
   onSubmit: (collection: Collection) => void;
   // eslint-disable-next-line no-unused-vars
   onChange?: (collection: Collection) => void;
+  /** Discards the draft and remounts this form fresh from `baseline`. */
+  onUndo?: () => Promise<void>;
 }) {
   const toast = useToast();
 
@@ -76,6 +79,12 @@ export default function CollectionForm({
   const [lastCommitResult, setLastCommitResult] = useState<CommitResult | null>(
     null,
   );
+
+  const [undoArmed, setUndoArmed] = useState(false);
+  const [undoing, setUndoing] = useState(false);
+  const undoArmTimeout = useRef<ReturnType<typeof setTimeout>>(undefined);
+
+  useEffect(() => () => clearTimeout(undoArmTimeout.current), []);
 
   const initialCollectionJSON = useRef(
     JSON.stringify(serialise(baseline ?? collection)),
@@ -244,7 +253,53 @@ export default function CollectionForm({
     setCommitting(false);
   }
 
-  const busy = isLoading || publishing || committing;
+  async function handleUndoClick() {
+    if (!undoArmed) {
+      setUndoArmed(true);
+      undoArmTimeout.current = setTimeout(() => setUndoArmed(false), 6000);
+      return;
+    }
+
+    clearTimeout(undoArmTimeout.current);
+    setUndoArmed(false);
+
+    if (!onUndo) return;
+
+    const removedSincePublish = (baseline ?? collection).pictures.filter(
+      (filename) => !picturesState.pictures.includes(filename),
+    );
+
+    setUndoing(true);
+
+    try {
+      if (removedSincePublish.length > 0) {
+        const res = await fetch(
+          `${ADMIN_API_URL}/api/admin/${collection.id}/pictures/remove`,
+          {
+            method: 'POST',
+            body: JSON.stringify({
+              filenames: removedSincePublish,
+              restore: true,
+            }),
+          },
+        );
+
+        if (!res.ok) throw new Error(await res.text());
+      }
+
+      await onUndo();
+    } catch (err) {
+      toast.show(
+        `Could not undo changes — ${
+          err instanceof Error ? err.message : 'unknown error'
+        }`,
+        'error',
+      );
+      setUndoing(false);
+    }
+  }
+
+  const busy = isLoading || publishing || committing || undoing;
 
   return (
     <div className={styles.stack}>
@@ -323,6 +378,21 @@ export default function CollectionForm({
                 : 'Publishing generates the downsized images and saves collections.json'}
             </span>
           </div>
+
+          {onUndo && (
+            <Button
+              variant="danger"
+              loading={undoing}
+              disabled={busy}
+              onClick={handleUndoClick}
+            >
+              {undoing
+                ? 'Undoing'
+                : undoArmed
+                  ? 'Confirm undo?'
+                  : 'Undo changes'}
+            </Button>
+          )}
 
           <Button
             variant="primary"
