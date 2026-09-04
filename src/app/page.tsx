@@ -41,6 +41,7 @@ export default async function Home() {
               cover={getThumbsSource(collection.slug, collection.cover)}
               coverWidth={coverDimensions[index]?.width}
               coverHeight={coverDimensions[index]?.height}
+              priority={index === 0}
             />
           </div>
         ))}

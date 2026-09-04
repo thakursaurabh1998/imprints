@@ -17,6 +17,8 @@ interface PhotoCardProps {
    */
   coverWidth?: number;
   coverHeight?: number;
+  /* Set on the first card only: the one cover guaranteed above the fold. */
+  priority?: boolean;
 }
 
 export default function PhotoCard({
@@ -26,6 +28,7 @@ export default function PhotoCard({
   cover,
   coverWidth,
   coverHeight,
+  priority = false,
 }: PhotoCardProps) {
   const router = useRouter();
 
@@ -45,6 +48,13 @@ export default function PhotoCard({
         className={styles.cover}
         width={coverWidth}
         height={coverHeight}
+        /*
+         * Previously unset, which made all 18 covers eager — several MB on
+         * first paint for images mostly below the fold.
+         */
+        loading={priority ? undefined : 'lazy'}
+        fetchPriority={priority ? 'high' : undefined}
+        decoding="async"
       />
       <div className={styles.content}>
         <h3 className={styles['collection-title']}>

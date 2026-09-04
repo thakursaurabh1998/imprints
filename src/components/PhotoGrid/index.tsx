@@ -36,6 +36,15 @@ export default function PhotoGrid({ collection, dimensions }: PhotoGridProps) {
         <section id={styles.photos}>
           {collection.pictures.map((image, index) => {
             const thumb = dimensions[image];
+            /*
+             * Index 0 is the top-left tile at every column count, so it is the
+             * one image guaranteed above the fold and the likely LCP element.
+             * Everything else stays lazy — eager-loading a 74-image collection
+             * would pull ~21MB on load. Deliberately not "the first N": CSS
+             * multi-column fills column-major, so the first N in DOM order are
+             * a vertical strip down column 1, not the visible top band.
+             */
+            const isLeadImage = index === 0;
 
             return (
               <img
@@ -51,7 +60,8 @@ export default function PhotoGrid({ collection, dimensions }: PhotoGridProps) {
                  */
                 width={thumb?.width}
                 height={thumb?.height}
-                loading="lazy"
+                loading={isLeadImage ? undefined : 'lazy'}
+                fetchPriority={isLeadImage ? 'high' : undefined}
                 decoding="async"
                 tabIndex={0}
                 role="button"
