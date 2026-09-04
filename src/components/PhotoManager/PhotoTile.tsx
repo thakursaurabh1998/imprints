@@ -61,7 +61,6 @@ function PhotoTileImpl({
       }}
     >
       {showImage ? (
-        /* eslint-disable-next-line @next/next/no-img-element */
         <img
           className={styles.image}
           src={getPreviewSource(slug, filename)}

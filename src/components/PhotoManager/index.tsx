@@ -122,7 +122,6 @@ export default function PhotoManager({
       dispatch({ type: 'queue', filenames: newFiles.map((f) => f.name) });
       runWithConcurrency(newFiles, UPLOAD_CONCURRENCY, uploadOne);
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [state.order, uploadOne, toast],
   );
 
@@ -223,7 +222,6 @@ export default function PhotoManager({
           ),
         };
       }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [
       state.order,
       state.items,

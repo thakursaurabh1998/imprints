@@ -8,10 +8,11 @@ import { getCollectionsStaticPaths } from '@/utils/collections-static-paths';
 import { generateCollectionMetadata } from '@/utils/generate-metadata';
 
 type PhotoCollectionProps = {
-  params: { collection: string };
+  params: Promise<{ collection: string }>;
 };
 
-export default function PhotoCollection({ params }: PhotoCollectionProps) {
+export default async function PhotoCollection(props: PhotoCollectionProps) {
+  const params = await props.params;
   const collectionObject: Collection | null = getCollectionMetaBySlug(
     params.collection,
   );
@@ -23,7 +24,8 @@ export default function PhotoCollection({ params }: PhotoCollectionProps) {
 
 export const generateStaticParams = getCollectionsStaticPaths;
 
-export function generateMetadata({ params }: PhotoCollectionProps): Metadata {
+export async function generateMetadata(props: PhotoCollectionProps): Promise<Metadata> {
+  const params = await props.params;
   const collectionObject = getCollectionMetaBySlug(params.collection);
 
   return {
