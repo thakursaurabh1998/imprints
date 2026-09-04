@@ -208,3 +208,26 @@
   background: var(--a-accent);
   transition: width 160ms ease;
 }
+
+/*
+ * Same fixed placement as .publishBar (never shown at the same time —
+ * this only renders when there are no unpublished changes), but a
+ * quieter, neutral treatment: it means "published; optionally get it
+ * reviewed," not "you have unpublished work."
+ */
+.commitBar {
+  position: fixed;
+  left: 50%;
+  bottom: calc(var(--a-site-header) + 18px);
+  transform: translateX(-50%);
+  width: min(1124px, calc(100vw - 56px));
+  z-index: 25;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 13px 18px;
+  background: var(--a-surface-2);
+  border: 1px solid var(--a-border);
+  border-radius: var(--a-radius);
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.35);
+}
