@@ -20,7 +20,6 @@ function Cover({ collection }: { collection: AdminCollection }) {
   }
 
   return (
-    /* eslint-disable-next-line @next/next/no-img-element */
     <img
       className={styles.cover}
       src={getPreviewSource(collection.slug, collection.cover)}
@@ -108,7 +107,7 @@ export default function CollectionTable({
         </thead>
         <tbody>
           {collections.map((collection) => {
-            const editHref = `/admin/collections/${collection.id}/edit`;
+            const editHref = `/admin/collections/edit?id=${collection.id}`;
 
             return (
               <tr key={collection.id} className={styles.row}>

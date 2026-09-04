@@ -8,7 +8,7 @@ export function useDebouncedCallback<Args extends unknown[]>(
   const callbackRef = useRef(callback);
   callbackRef.current = callback;
 
-  const timeoutRef = useRef<ReturnType<typeof setTimeout>>();
+  const timeoutRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   useEffect(() => () => clearTimeout(timeoutRef.current), []);
 

@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 
 import PhotoManager, { PhotoManagerPictures } from '@/components/PhotoManager';
 import { Button, Input, Textarea, useToast } from '@/components/ui';
+import { ADMIN_API_URL } from '@/utils/admin-api';
 import { Collection } from '@/utils/collection-config';
 import { runWithConcurrency } from '@/utils/upload-image';
 import styles from './CollectionForm.module.css';
@@ -123,10 +124,13 @@ export default function CollectionForm({
         picturesState.pictures,
         DERIVE_CONCURRENCY,
         async (filename) => {
-          const res = await fetch(`/api/admin/${collection.id}/derive`, {
-            method: 'POST',
-            body: JSON.stringify({ filenames: [filename] }),
-          });
+          const res = await fetch(
+            `${ADMIN_API_URL}/api/admin/${collection.id}/derive`,
+            {
+              method: 'POST',
+              body: JSON.stringify({ filenames: [filename] }),
+            },
+          );
 
           if (!res.ok) throw new Error(await res.text());
 

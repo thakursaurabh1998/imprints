@@ -1,23 +1,24 @@
-import path from 'path';
+import path from 'node:path';
 
-import { NextRequest, NextResponse } from 'next/server';
-
-import { getCollectionById } from '@/utils/collection-config';
-import { IS_PRODUCTION } from '@/utils/constants';
-import { deleteUploadedImage, saveUploadedImage } from '@/utils/save-image';
+import { getCollectionById } from '../../src/utils/collection-config';
+import { IS_PRODUCTION } from '../../src/utils/constants';
+import {
+  deleteUploadedImage,
+  saveUploadedImage,
+} from '../../src/utils/save-image';
 
 const ALLOWED_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 const REJECTED_MIME_TYPES = ['image/heic', 'image/heif'];
 
-export async function POST(
-  req: NextRequest,
-  context: { params: { collectionId: string } },
-) {
+export async function uploadImage(
+  req: Request,
+  params: { collectionId: string },
+): Promise<Response> {
   if (IS_PRODUCTION) {
     return new Response('Not available in production', { status: 403 });
   }
 
-  const { collectionId } = context.params;
+  const { collectionId } = params;
 
   const formData = await req.formData();
   const imageFile = formData.get('file') as File | null;
@@ -59,5 +60,5 @@ export async function POST(
     );
   }
 
-  return NextResponse.json({ filename });
+  return Response.json({ filename });
 }

@@ -7,6 +7,7 @@ import CollectionTable, {
   AdminCollection,
 } from '@/components/CollectionTable';
 import { Badge, Button, Panel } from '@/components/ui';
+import { ADMIN_API_URL } from '@/utils/admin-api';
 import { hideInProduction } from '@/utils/hide-in-production';
 
 async function fetcher(url: string) {
@@ -26,7 +27,7 @@ export default function AdminPanel() {
     data: collections,
     error,
     isLoading,
-  } = useSWR<AdminCollection[]>('/api/admin', fetcher);
+  } = useSWR<AdminCollection[]>(`${ADMIN_API_URL}/api/admin`, fetcher);
 
   const draftCount = collections?.filter((c) => c.hasDraft).length ?? 0;
   const photoCount =

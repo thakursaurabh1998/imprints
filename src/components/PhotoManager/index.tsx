@@ -8,6 +8,7 @@ import React, {
 
 import SortableGrid from '@/components/SortableGrid';
 import { Badge, Button, Toolbar, useToast } from '@/components/ui';
+import { ADMIN_API_URL } from '@/utils/admin-api';
 import { pushToUniqueList } from '@/utils/deduplicated-list';
 import { runWithConcurrency, uploadImage } from '@/utils/upload-image';
 import Dropzone from './Dropzone';
@@ -78,7 +79,7 @@ export default function PhotoManager({
 
       try {
         const { filename } = await uploadImage(
-          `/api/admin/${collectionId}/upload`,
+          `${ADMIN_API_URL}/api/admin/${collectionId}/upload`,
           { arg: file },
         );
         dispatch({ type: 'markReady', filename });
@@ -121,7 +122,6 @@ export default function PhotoManager({
       dispatch({ type: 'queue', filenames: newFiles.map((f) => f.name) });
       runWithConcurrency(newFiles, UPLOAD_CONCURRENCY, uploadOne);
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [state.order, uploadOne, toast],
   );
 
@@ -131,7 +131,7 @@ export default function PhotoManager({
 
       try {
         const res = await fetch(
-          `/api/admin/${collectionId}/pictures/remove`,
+          `${ADMIN_API_URL}/api/admin/${collectionId}/pictures/remove`,
           { method: 'POST', body: JSON.stringify({ filenames }) },
         );
 
@@ -155,10 +155,13 @@ export default function PhotoManager({
     if (filenames.length === 0) return;
 
     try {
-      const res = await fetch(`/api/admin/${collectionId}/pictures/remove`, {
-        method: 'POST',
-        body: JSON.stringify({ filenames, restore: true }),
-      });
+      const res = await fetch(
+        `${ADMIN_API_URL}/api/admin/${collectionId}/pictures/remove`,
+        {
+          method: 'POST',
+          body: JSON.stringify({ filenames, restore: true }),
+        },
+      );
 
       if (!res.ok) throw new Error(await res.text());
 
@@ -219,7 +222,6 @@ export default function PhotoManager({
           ),
         };
       }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [
       state.order,
       state.items,

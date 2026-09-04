@@ -38,3 +38,7 @@ original
 
 # admin authoring scratch (drafts, trash) — never served, never committed
 .admin-scratch
+
+# transient holding dir used by scripts/build-static-export.sh; should
+# never survive a build, but ignore defensively in case of interruption
+/.build-excluded
