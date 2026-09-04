@@ -7,6 +7,7 @@ import { getCollectionMetaBySlug } from '@/utils/collection-meta';
 import { getCollectionsStaticPaths } from '@/utils/collections-static-paths';
 import { IS_PRODUCTION } from '@/utils/constants';
 import { generateCollectionMetadata } from '@/utils/generate-metadata';
+import { getThumbDimensionsMap } from '@/utils/thumb-dimensions';
 
 type PhotoCollectionProps = {
   params: Promise<{ collection: string }>;
@@ -36,7 +37,18 @@ export default async function PhotoCollection(props: PhotoCollectionProps) {
 
   if (!collectionObject) notFound();
 
-  return <PhotoGrid collection={collectionObject} />;
+  /*
+   * Read at build time (this page is prerendered under `output: 'export'`) so
+   * every tile can carry real width/height attributes and the masonry reserves
+   * its final geometry on first paint. Scoped to this collection's pictures, so
+   * the flight payload carries only what this page renders.
+   */
+  const dimensions = await getThumbDimensionsMap(
+    collectionObject.slug,
+    collectionObject.pictures,
+  );
+
+  return <PhotoGrid collection={collectionObject} dimensions={dimensions} />;
 }
 
 export const generateStaticParams = getCollectionsStaticPaths;
