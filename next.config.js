@@ -5,6 +5,9 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
+  allowedDevOrigins: process.env.NEXT_DEV_ALLOWED_ORIGIN
+    ? [process.env.NEXT_DEV_ALLOWED_ORIGIN]
+    : [],
 };
 
 module.exports = nextConfig;
