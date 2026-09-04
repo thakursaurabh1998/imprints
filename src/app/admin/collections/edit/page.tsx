@@ -29,6 +29,7 @@ export default function CollectionSet() {
   const collectionId = useSearchParams().get('id');
 
   const [loading, setLoading] = useState(false);
+  const [resetToken, setResetToken] = useState(0);
 
   const { data: collection, error: collectionError } = useSWR<Collection>(
     collectionId ? `${ADMIN_API_URL}/api/admin/${collectionId}` : null,
@@ -55,6 +56,20 @@ export default function CollectionSet() {
   }, 500);
 
   const [previewing, setPreviewing] = useState(false);
+
+  const handleUndo = async () => {
+    if (!collectionId) return;
+
+    // Settle any pending/in-flight autosave first, so it can't land after
+    // the delete below and resurrect the draft we're about to discard.
+    await saveDraft.flush();
+
+    await fetch(`${ADMIN_API_URL}/api/admin/${collectionId}/draft`, {
+      method: 'DELETE',
+    });
+    await mutateDraft(null);
+    setResetToken((token) => token + 1);
+  };
 
   if (!collectionId || collectionError) {
     notFound();
@@ -142,11 +157,13 @@ export default function CollectionSet() {
       />
 
       <CollectionForm
+        key={`${collectionId}-${resetToken}`}
         isLoading={loading}
         collection={mergedCollection}
         baseline={collection}
         onSubmit={handleFormData}
         onChange={saveDraft}
+        onUndo={handleUndo}
       />
     </>
   );
