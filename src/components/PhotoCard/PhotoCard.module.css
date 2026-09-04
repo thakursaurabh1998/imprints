@@ -1,6 +1,7 @@
 .collection-card {
   background-color: #161819;
   cursor: pointer;
+  break-inside: avoid;
 }
 
 .cover {
