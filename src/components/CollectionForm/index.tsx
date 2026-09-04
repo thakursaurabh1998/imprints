@@ -349,6 +349,21 @@ export default function CollectionForm({
                 </span>
               </div>
 
+              {onUndo && (
+                <Button
+                  variant="danger"
+                  loading={undoing}
+                  disabled={busy}
+                  onClick={handleUndoClick}
+                >
+                  {undoing
+                    ? 'Undoing'
+                    : undoArmed
+                    ? 'Confirm undo?'
+                    : 'Undo changes'}
+                </Button>
+              )}
+
               <Button
                 variant="primary"
                 loading={busy}
@@ -435,93 +450,6 @@ export default function CollectionForm({
           </div>
         </div>
       </div>
-
-      {hasChanges && (
-        <div className={styles.publishBar}>
-          <div className={styles.publishText}>
-            <span className={styles.publishTitle}>
-              {publishing && deriveProgress
-                ? `Generating images — ${deriveProgress.done} of ${deriveProgress.total}`
-                : 'Unpublished changes'}
-            </span>
-            <span className={styles.publishHint}>
-              {publishing
-                ? 'Writing collections.json once every image is generated'
-                : 'Publishing generates the downsized images and saves collections.json'}
-            </span>
-          </div>
-
-          {onUndo && (
-            <Button
-              variant="danger"
-              loading={undoing}
-              disabled={busy}
-              onClick={handleUndoClick}
-            >
-              {undoing
-                ? 'Undoing'
-                : undoArmed
-                ? 'Confirm undo?'
-                : 'Undo changes'}
-            </Button>
-          )}
-
-          <Button
-            variant="primary"
-            loading={busy}
-            disabled={busy}
-            onClick={handlePublish}
-          >
-            {publishing ? 'Publishing' : 'Publish'}
-          </Button>
-
-          {publishing && deriveProgress && deriveProgress.total > 0 && (
-            <div className={styles.progressTrack}>
-              <div
-                className={styles.progressFill}
-                style={{
-                  width: `${
-                    (deriveProgress.done / deriveProgress.total) * 100
-                  }%`,
-                }}
-              />
-            </div>
-          )}
-        </div>
-      )}
-
-      {!hasChanges && (
-        <div className={styles.commitBar}>
-          <div className={styles.publishText}>
-            <span className={styles.publishTitle}>Version control</span>
-            <span className={styles.publishHint}>
-              Commits collections.json and the images for this collection to a
-              collection/{combined.slug} branch, then pushes it to origin.
-            </span>
-          </div>
-
-          <Button
-            variant="secondary"
-            loading={committing}
-            disabled={busy}
-            onClick={handleCommit}
-          >
-            {committing ? 'Committing' : 'Commit & push'}
-          </Button>
-
-          {lastCommitResult?.status === 'committed' &&
-            lastCommitResult.compareUrl && (
-              <Button
-                variant="ghost"
-                href={lastCommitResult.compareUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Create PR →
-              </Button>
-            )}
-        </div>
-      )}
     </div>
   );
 }
