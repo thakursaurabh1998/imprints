@@ -5,13 +5,20 @@ import { useRef, useState } from 'react';
 import Lightbox from '@/components/Lightbox';
 import { Collection } from '@/utils/collection-config';
 import { getThumbsSource } from '@/utils/picture-source';
+import { ThumbDimensionsMap } from '@/utils/thumb-dimensions';
 import styles from './PhotoGrid.module.css';
 
 interface PhotoGridProps {
   collection: Collection;
+  /*
+   * Thumb pixel dimensions keyed by filename, read from disk at build time. A
+   * missing entry is the degraded path: the attributes are omitted and the tile
+   * behaves as it did before, rather than being sized wrongly.
+   */
+  dimensions: ThumbDimensionsMap;
 }
 
-export default function PhotoGrid({ collection }: PhotoGridProps) {
+export default function PhotoGrid({ collection, dimensions }: PhotoGridProps) {
   const [showLightbox, setShowLightbox] = useState(false);
   const [clickedImage, setClickedImage] = useState(0);
   const thumbRefs = useRef<Record<number, HTMLImageElement | null>>({});
@@ -27,27 +34,37 @@ export default function PhotoGrid({ collection }: PhotoGridProps) {
     <>
       <div className={styles['photo-wrapper']}>
         <section id={styles.photos}>
-          {collection.pictures.map((image, index) => (
-            <img
-              key={image}
-              ref={(el) => {
-                thumbRefs.current[index] = el;
-              }}
-              src={getThumbsSource(collection.slug, image)}
-              alt={`${collection.title} — photo ${index + 1}`}
-              loading="lazy"
-              decoding="async"
-              tabIndex={0}
-              role="button"
-              onClick={() => handleClickOnImage(index)}
-              onKeyDown={(event) => {
-                if (event.key === 'Enter' || event.key === ' ') {
-                  event.preventDefault();
-                  handleClickOnImage(index);
-                }
-              }}
-            />
-          ))}
+          {collection.pictures.map((image, index) => {
+            const thumb = dimensions[image];
+
+            return (
+              <img
+                key={image}
+                ref={(el) => {
+                  thumbRefs.current[index] = el;
+                }}
+                src={getThumbsSource(collection.slug, image)}
+                alt={`${collection.title} — photo ${index + 1}`}
+                /*
+                 * Both or neither: the width/height presentational hint only
+                 * yields an aspect ratio when the pair is complete.
+                 */
+                width={thumb?.width}
+                height={thumb?.height}
+                loading="lazy"
+                decoding="async"
+                tabIndex={0}
+                role="button"
+                onClick={() => handleClickOnImage(index)}
+                onKeyDown={(event) => {
+                  if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    handleClickOnImage(index);
+                  }
+                }}
+              />
+            );
+          })}
         </section>
       </div>
 

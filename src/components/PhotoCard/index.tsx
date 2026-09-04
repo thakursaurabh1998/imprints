@@ -11,6 +11,12 @@ interface PhotoCardProps {
   slug: string;
   description: string;
   cover: string;
+  /*
+   * Cover thumb dimensions, read from disk at build time. Both or neither — the
+   * width/height presentational hint only yields an aspect ratio as a pair.
+   */
+  coverWidth?: number;
+  coverHeight?: number;
 }
 
 export default function PhotoCard({
@@ -18,6 +24,8 @@ export default function PhotoCard({
   slug,
   description,
   cover,
+  coverWidth,
+  coverHeight,
 }: PhotoCardProps) {
   const router = useRouter();
 
@@ -31,7 +39,13 @@ export default function PhotoCard({
       onClick={handleCardClick}
       className={styles['collection-card']}
     >
-      <img src={cover} alt={title} className={styles.cover} />
+      <img
+        src={cover}
+        alt={title}
+        className={styles.cover}
+        width={coverWidth}
+        height={coverHeight}
+      />
       <div className={styles.content}>
         <h3 className={styles['collection-title']}>
           <Link href={`/collection/${slug}`}>{title.toUpperCase()}</Link>
