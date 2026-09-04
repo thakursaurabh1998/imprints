@@ -1,5 +1,9 @@
 .photo-wrapper {
-  padding: 5px;
+  /* Extra breathing room above row 1: cards now get their vertical gap from
+     margin-bottom only (margin-top would get stripped at column breaks —
+     see PhotoCard.module.css), so this padding is the only thing separating
+     the very first row from the top of the page. */
+  padding: 13px 5px 5px;
   background: #1f2224;
 }
 
@@ -27,6 +31,27 @@
   width: 100% !important;
   height: auto !important;
   padding: 5px 5px;
+
+  /*
+   * Each tile is a plain <img onClick=...>, not a natively-interactive
+   * element — Safari/WebKit only reliably promotes taps to click events on
+   * an element like that when it looks clickable, and `cursor: pointer` is
+   * the signal it checks. Without it, desktop shows no hand cursor and
+   * mobile taps can get silently dropped instead of opening the lightbox.
+   */
+  cursor: pointer;
+
+  /*
+   * iOS Safari treats a plain <img> as a native object first: long-press
+   * opens its save/copy callout and a slight finger drag during the tap
+   * starts an image drag instead of ever dispatching `click`. Both preempt
+   * the tap before React's onClick sees it, so the lightbox silently fails
+   * to open on a phone even though the exact same handler fires reliably
+   * from a mouse click on desktop.
+   */
+  -webkit-touch-callout: none;
+  -webkit-user-drag: none;
+  user-select: none;
 
   /*
    * Fills the reserved box while the photo is downloading or decoding, so the
@@ -60,10 +85,15 @@
     column-count: 1;
   }
   .photo-wrapper {
-    padding: 0px 0px 56px 0px;
+    /* Side padding is 0 here (images run full-bleed), so the card's own 8px
+       margin (PhotoCard.module.css) is the entire visible side gap. Cards
+       carry margin-bottom only, never margin-top, so top padding is the only
+       thing separating row 1 from the top of the page — match it to that
+       same 8px, not desktop's 13px, or top ends up wider than the sides. */
+    padding: 8px 0px 56px 0px;
   }
 
-  #photos img {
+  #photos > img {
     padding: 5px 0px;
   }
 }

@@ -1,9 +1,15 @@
 .collection-card {
-  background-color: #161819;
-  cursor: pointer;
+  /* margin-top stays 0, not 8px: browsers zero out a fragmented box's
+     leading margin at the top of a new column, but not for the very first
+     item in the whole grid — an even top/bottom margin here would leave
+     column 1 sitting 8px lower than columns 2+. Put the spacing on
+     margin-bottom instead, where every card behaves the same. */
+  display: block;
+  margin: 0 8px 16px;
   break-inside: avoid;
   border-radius: 4px;
   overflow: hidden;
+  text-decoration: none;
 }
 
 .cover {
@@ -20,18 +26,15 @@
      line boxes to zero height. */
   line-height: 1.4;
   padding: 16px;
+  background-color: #161819;
 }
 
 .collection-title {
   margin: 0 0 8px;
   font-size: 1.25em;
-}
-
-.collection-title a {
   color: #d7d7d7;
   font-weight: 600;
   letter-spacing: 0.035em;
-  text-decoration: none;
 }
 
 .collection-description {
