@@ -1,4 +1,5 @@
 import { getCollection, updateCollection } from './routes/collection';
+import { commitCollection } from './routes/commit';
 import { deleteDraft, getDraft, saveDraft } from './routes/draft';
 import { deriveImages } from './routes/derive';
 import { listCollections } from './routes/list';
@@ -44,6 +45,7 @@ const routes: Route[] = [
   route('PUT', '/api/admin/:collectionId/draft', saveDraft),
   route('DELETE', '/api/admin/:collectionId/draft', deleteDraft),
   route('POST', '/api/admin/:collectionId/derive', deriveImages),
+  route('POST', '/api/admin/:collectionId/commit', commitCollection),
   route('POST', '/api/admin/:collectionId/upload', uploadImage),
   route('POST', '/api/admin/:collectionId/pictures/remove', removePictures),
 ];

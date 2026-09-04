@@ -204,9 +204,10 @@ export default function CollectionForm({
     setCommitting(true);
 
     try {
-      const res = await fetch(`/api/admin/${collection.id}/commit`, {
-        method: 'POST',
-      });
+      const res = await fetch(
+        `${ADMIN_API_URL}/api/admin/${collection.id}/commit`,
+        { method: 'POST' },
+      );
 
       if (!res.ok) throw new Error(await res.text());
 
