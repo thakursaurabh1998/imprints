@@ -33,17 +33,16 @@ export default async function Home() {
     <div className={photogridStyles['photo-wrapper']}>
       <section id={photogridStyles.photos}>
         {config.collections.map((collection, index) => (
-          <div key={collection.slug} style={{ padding: 8 }}>
-            <PhotoCard
-              title={collection.title}
-              slug={collection.slug}
-              description={collection.description}
-              cover={getThumbsSource(collection.slug, collection.cover)}
-              coverWidth={coverDimensions[index]?.width}
-              coverHeight={coverDimensions[index]?.height}
-              priority={index === 0}
-            />
-          </div>
+          <PhotoCard
+            key={collection.slug}
+            title={collection.title}
+            slug={collection.slug}
+            description={collection.description}
+            cover={getThumbsSource(collection.slug, collection.cover)}
+            coverWidth={coverDimensions[index]?.width}
+            coverHeight={coverDimensions[index]?.height}
+            priority={index === 0}
+          />
         ))}
       </section>
     </div>
