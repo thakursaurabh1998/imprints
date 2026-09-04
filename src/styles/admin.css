@@ -32,7 +32,7 @@
   --a-radius-sm: 5px;
   --a-focus: 0 0 0 3px rgba(245, 166, 35, 0.35);
 
-  --a-font: 'Source Sans Pro', Helvetica, sans-serif;
+  --a-font: var(--font-source-sans), Helvetica, sans-serif;
   --a-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, monospace;
 
   /* The site header is fixed to the BOTTOM of the viewport (56px tall), so
