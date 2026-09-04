@@ -3,8 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "bash scripts/build-static-export.sh",
+    "dev": "concurrently -n next,admin-api -c blue,yellow \"next dev\" \"tsx watch server/index.ts\"",
+    "dev:web": "next dev",
+    "dev:api": "tsx watch server/index.ts",
+    "build": "next build",
     "start": "next start",
     "lint": "next lint"
   },
@@ -24,12 +26,14 @@
     "@types/react": "18.3.31",
     "@types/react-dom": "18.3.7",
     "@types/uuid": "^9.0.2",
+    "concurrently": "^10.0.5",
     "eslint": "8.57.1",
     "eslint-config-next": "14.2.35",
     "eslint-config-prettier": "^8.9.0",
     "eslint-plugin-import": "^2.28.0",
     "husky": "^8.0.3",
     "prettier": "^3.0.0",
+    "tsx": "^4.23.13",
     "typescript": "4.9.5"
   },
   "overrides": {

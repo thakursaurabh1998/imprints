@@ -108,7 +108,7 @@ export default function CollectionTable({
         </thead>
         <tbody>
           {collections.map((collection) => {
-            const editHref = `/admin/collections/${collection.id}/edit`;
+            const editHref = `/admin/collections/edit?id=${collection.id}`;
 
             return (
               <tr key={collection.id} className={styles.row}>

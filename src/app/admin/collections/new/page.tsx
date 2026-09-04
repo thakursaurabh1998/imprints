@@ -7,6 +7,7 @@ import { v4 as uuid } from 'uuid';
 
 import AdminHeader from '@/components/AdminHeader';
 import { Button, Input, Panel, Textarea, useToast } from '@/components/ui';
+import { ADMIN_API_URL } from '@/utils/admin-api';
 import { Collection } from '@/utils/collection-config';
 import { hideInProduction } from '@/utils/hide-in-production';
 import { tidySlug, toSlugChars } from '@/utils/slug';
@@ -26,7 +27,10 @@ export default function NewCollection() {
   // Once the slug is hand-edited, stop deriving it from the title.
   const [slugTouched, setSlugTouched] = useState(false);
 
-  const { trigger } = useSWRMutation('/api/admin/new', createCollection);
+  const { trigger } = useSWRMutation(
+    `${ADMIN_API_URL}/api/admin/new`,
+    createCollection,
+  );
 
   const effectiveSlug = slugTouched ? slug : tidySlug(title);
   const submittedSlug = tidySlug(effectiveSlug);
@@ -54,7 +58,7 @@ export default function NewCollection() {
       });
 
       if (res?.ok) {
-        router.replace(`/admin/collections/${id}/edit`);
+        router.replace(`/admin/collections/edit?id=${id}`);
         return;
       }
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { notFound } from 'next/navigation';
+import { notFound, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
@@ -8,6 +8,7 @@ import useSWRMutation from 'swr/mutation';
 import AdminHeader from '@/components/AdminHeader';
 import CollectionForm from '@/components/CollectionForm';
 import { Badge, Button, Spinner } from '@/components/ui';
+import { ADMIN_API_URL } from '@/utils/admin-api';
 import { Collection } from '@/utils/collection-config';
 import { useDebouncedCallback } from '@/utils/debounce';
 import { hideInProduction } from '@/utils/hide-in-production';
@@ -22,36 +23,38 @@ async function fetcher(url: string) {
   return res.json();
 }
 
-export default function CollectionSet({
-  params: { collectionId },
-}: {
-  params: { collectionId: string };
-}) {
+export default function CollectionSet() {
   hideInProduction();
+
+  const collectionId = useSearchParams().get('id');
 
   const [loading, setLoading] = useState(false);
 
   const { data: collection, error: collectionError } = useSWR<Collection>(
-    `/api/admin/${collectionId}`,
+    collectionId ? `${ADMIN_API_URL}/api/admin/${collectionId}` : null,
     fetcher,
   );
-  const { data: draft, mutate: mutateDraft } = useSWR<
-    Partial<Collection> | null
-  >(`/api/admin/${collectionId}/draft`, fetcher);
+  const { data: draft, mutate: mutateDraft } =
+    useSWR<Partial<Collection> | null>(
+      collectionId ? `${ADMIN_API_URL}/api/admin/${collectionId}/draft` : null,
+      fetcher,
+    );
 
   const { trigger } = useSWRMutation(
-    `/api/admin/${collectionId}`,
+    collectionId ? `${ADMIN_API_URL}/api/admin/${collectionId}` : null,
     updateCollection,
   );
 
   const saveDraft = useDebouncedCallback((values: Collection) => {
-    fetch(`/api/admin/${collectionId}/draft`, {
+    if (!collectionId) return;
+
+    fetch(`${ADMIN_API_URL}/api/admin/${collectionId}/draft`, {
       method: 'PUT',
       body: JSON.stringify(values),
     }).then(() => mutateDraft(values));
   }, 500);
 
-  if (collectionError) {
+  if (!collectionId || collectionError) {
     notFound();
   }
 
@@ -84,7 +87,9 @@ export default function CollectionSet({
   const handleFormData = async (collectionData: Collection) => {
     setLoading(true);
     await trigger(collectionData);
-    await fetch(`/api/admin/${collectionId}/draft`, { method: 'DELETE' });
+    await fetch(`${ADMIN_API_URL}/api/admin/${collectionId}/draft`, {
+      method: 'DELETE',
+    });
     await mutateDraft(null);
     setLoading(false);
   };
@@ -106,10 +111,7 @@ export default function CollectionSet({
           </>
         }
         actions={
-          <Button
-            variant="ghost"
-            href={`/collection/${mergedCollection.slug}`}
-          >
+          <Button variant="ghost" href={`/collection/${mergedCollection.slug}`}>
             Preview
           </Button>
         }

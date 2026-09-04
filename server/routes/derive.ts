@@ -1,12 +1,10 @@
-import { NextRequest, NextResponse } from 'next/server';
-
-import { getCollectionById } from '@/utils/collection-config';
-import { IS_PRODUCTION } from '@/utils/constants';
+import { getCollectionById } from '../../src/utils/collection-config';
+import { IS_PRODUCTION } from '../../src/utils/constants';
 import {
   derivativesExist,
   originalImageExists,
   saveDerivatives,
-} from '@/utils/save-image';
+} from '../../src/utils/save-image';
 
 type DeriveResult = {
   filename: string;
@@ -14,22 +12,21 @@ type DeriveResult = {
   reason?: string;
 };
 
-export async function POST(
-  req: NextRequest,
-  context: { params: { collectionId: string } },
-) {
+export async function deriveImages(
+  req: Request,
+  params: { collectionId: string },
+): Promise<Response> {
   if (IS_PRODUCTION) {
     return new Response('Not available in production', { status: 403 });
   }
 
-  const { collectionId } = context.params;
   const { filenames } = (await req.json()) as { filenames: string[] };
 
   if (!Array.isArray(filenames) || filenames.length === 0) {
     return new Response('filenames is required', { status: 400 });
   }
 
-  const collection = await getCollectionById(collectionId);
+  const collection = await getCollectionById(params.collectionId);
 
   if (!collection) {
     return new Response('Collection not found!', { status: 404 });
@@ -39,10 +36,13 @@ export async function POST(
     filenames.map((filename) => deriveOne(collection.slug, filename)),
   );
 
-  return NextResponse.json({ results });
+  return Response.json({ results });
 }
 
-async function deriveOne(slug: string, filename: string): Promise<DeriveResult> {
+async function deriveOne(
+  slug: string,
+  filename: string,
+): Promise<DeriveResult> {
   const relativeFilePath = `${slug}/${filename}`;
 
   if (await derivativesExist({ relativeFilePath })) {
