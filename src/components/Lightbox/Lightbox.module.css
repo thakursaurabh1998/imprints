@@ -9,7 +9,7 @@
 .backdrop {
   position: absolute;
   inset: 0;
-  background: rgba(10, 10, 10, 0.95);
+  background: rgba(10, 10, 10, 0.75);
   pointer-events: none;
 }
 
@@ -91,6 +91,8 @@
   background: rgba(127, 127, 127, 0.4);
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
+  opacity: 1;
+  transition: opacity 200ms ease;
 }
 
 .close {
@@ -106,12 +108,6 @@
   color: #fff;
   font-size: 28px;
   line-height: 1;
-  opacity: 0;
-  transition: opacity 150ms ease;
-}
-
-.overlay:hover .nav {
-  opacity: 1;
 }
 
 .navPrev {
@@ -120,6 +116,12 @@
 
 .navNext {
   right: calc(env(safe-area-inset-right, 0px) + 16px);
+}
+
+.chrome.idle .close,
+.chrome.idle .nav {
+  opacity: 0;
+  pointer-events: none;
 }
 
 .counter {
@@ -133,12 +135,6 @@
   background: rgba(127, 127, 127, 0.35);
   padding: 4px 12px;
   border-radius: 999px;
-}
-
-@media (max-width: 736px) {
-  .nav {
-    opacity: 1;
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {

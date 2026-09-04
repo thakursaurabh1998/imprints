@@ -29,6 +29,7 @@ export default function CollectionSet() {
   const collectionId = useSearchParams().get('id');
 
   const [loading, setLoading] = useState(false);
+  const [resetToken, setResetToken] = useState(0);
 
   const { data: collection, error: collectionError } = useSWR<Collection>(
     collectionId ? `${ADMIN_API_URL}/api/admin/${collectionId}` : null,
@@ -48,11 +49,27 @@ export default function CollectionSet() {
   const saveDraft = useDebouncedCallback((values: Collection) => {
     if (!collectionId) return;
 
-    fetch(`${ADMIN_API_URL}/api/admin/${collectionId}/draft`, {
+    return fetch(`${ADMIN_API_URL}/api/admin/${collectionId}/draft`, {
       method: 'PUT',
       body: JSON.stringify(values),
     }).then(() => mutateDraft(values));
   }, 500);
+
+  const [previewing, setPreviewing] = useState(false);
+
+  const handleUndo = async () => {
+    if (!collectionId) return;
+
+    // Settle any pending/in-flight autosave first, so it can't land after
+    // the delete below and resurrect the draft we're about to discard.
+    await saveDraft.flush();
+
+    await fetch(`${ADMIN_API_URL}/api/admin/${collectionId}/draft`, {
+      method: 'DELETE',
+    });
+    await mutateDraft(null);
+    setResetToken((token) => token + 1);
+  };
 
   if (!collectionId || collectionError) {
     notFound();
@@ -94,6 +111,23 @@ export default function CollectionSet() {
     setLoading(false);
   };
 
+  const handlePreview = async () => {
+    setPreviewing(true);
+    // Best-effort — a flaky draft PUT shouldn't strand the user unable to
+    // preview at all; worst case they see the last successfully saved draft.
+    await saveDraft.flush().catch(() => {});
+    // The PUBLISHED slug, not mergedCollection.slug — a draft-edited slug
+    // has no entry in collections.json yet, so following it would 404
+    // instead of showing a preview.
+    //
+    // A hard reload, not router.push() — /collection/[slug] is statically
+    // generated, so the client router cache would happily serve a stale
+    // copy from an earlier preview for up to 5 minutes (staleTimes.static).
+    // That's exactly the bug this fixes; a full reload can't hit it.
+    // eslint-disable-next-line @next/next/no-location-assign-relative-destination
+    window.location.href = `/collection/${collection.slug}`;
+  };
+
   return (
     <>
       <AdminHeader
@@ -111,18 +145,25 @@ export default function CollectionSet() {
           </>
         }
         actions={
-          <Button variant="ghost" href={`/collection/${mergedCollection.slug}`}>
+          <Button
+            variant="ghost"
+            loading={previewing}
+            disabled={previewing}
+            onClick={handlePreview}
+          >
             Preview
           </Button>
         }
       />
 
       <CollectionForm
+        key={`${collectionId}-${resetToken}`}
         isLoading={loading}
         collection={mergedCollection}
         baseline={collection}
         onSubmit={handleFormData}
         onChange={saveDraft}
+        onUndo={handleUndo}
       />
     </>
   );

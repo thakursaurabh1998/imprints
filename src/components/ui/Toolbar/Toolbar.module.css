@@ -6,8 +6,10 @@
 .toolbar {
   position: fixed;
   left: 50%;
-  /* Sits above the publish bar, which occupies site-header + 18px. */
-  bottom: calc(var(--a-site-header) + 96px);
+  /* The publish/commit bar no longer floats at the bottom of the viewport
+     (it now docks inside CollectionForm's Details column), so this is the
+     only bottom-floating chrome left and can own this slot. */
+  bottom: calc(var(--a-site-header) + 18px);
   transform: translateX(-50%);
   z-index: 30;
   display: flex;
