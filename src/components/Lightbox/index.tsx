@@ -13,6 +13,7 @@ import { createPortal } from 'react-dom';
 import Slide from './Slide';
 import styles from './Lightbox.module.css';
 import { useCarouselGesture } from './useCarouselGesture';
+import { useIdleVisibility } from './useIdleVisibility';
 import { useScrollLock } from './useScrollLock';
 
 interface LightboxProps {
@@ -65,6 +66,13 @@ export default function Lightbox({
 
   useScrollLock({ containerRef: dialogRef, returnFocusRef });
 
+  const {
+    visible: controlsVisible,
+    pause: pauseIdle,
+    resume: resumeIdle,
+    toggle: toggleControls,
+  } = useIdleVisibility({ targetRef: dialogRef, ready: portalReady });
+
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
       if (event.key === 'Escape') {
@@ -86,10 +94,13 @@ export default function Lightbox({
         didDragRef.current = false;
         return;
       }
-      if (event.target instanceof HTMLImageElement) return;
+      if (event.target instanceof HTMLImageElement) {
+        toggleControls();
+        return;
+      }
       onClose();
     },
-    [didDragRef, onClose],
+    [didDragRef, onClose, toggleControls],
   );
 
   if (!portalReady) return null;
@@ -138,11 +149,16 @@ export default function Lightbox({
         </div>
       </div>
 
-      <div ref={chromeRef} className={styles.chrome}>
+      <div
+        ref={chromeRef}
+        className={`${styles.chrome} ${controlsVisible ? '' : styles.idle}`}
+      >
         <button
           type="button"
           className={styles.close}
           onClick={onClose}
+          onPointerEnter={pauseIdle}
+          onPointerLeave={resumeIdle}
           aria-label="Close"
         >
           <img height={20} width={20} alt="" src="/assets/close.svg" />
@@ -153,6 +169,8 @@ export default function Lightbox({
             type="button"
             className={`${styles.nav} ${styles.navPrev}`}
             onClick={triggerPrev}
+            onPointerEnter={pauseIdle}
+            onPointerLeave={resumeIdle}
             aria-label="Previous photo"
           >
             &#8249;
@@ -164,6 +182,8 @@ export default function Lightbox({
             type="button"
             className={`${styles.nav} ${styles.navNext}`}
             onClick={triggerNext}
+            onPointerEnter={pauseIdle}
+            onPointerLeave={resumeIdle}
             aria-label="Next photo"
           >
             &#8250;

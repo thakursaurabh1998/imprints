@@ -9,6 +9,9 @@
 .cover {
   display: block;
   width: 100%;
+  /* Required companion to the width/height attributes: a fixed height would
+     override the attribute-derived aspect ratio and defeat the reservation. */
+  height: auto;
 }
 
 .content {

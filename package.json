@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "concurrently -n next,admin-api -c blue,yellow \"next dev\" \"tsx watch server/index.ts\"",
+    "dev": "concurrently -n next,admin-api -c blue,yellow \"next dev\" \"tsx watch --env-file-if-exists=.env.local server/index.ts\"",
     "dev:web": "next dev",
-    "dev:api": "tsx watch server/index.ts",
+    "dev:api": "tsx watch --env-file-if-exists=.env.local server/index.ts",
     "build": "next build",
     "start": "next start",
     "lint": "eslint ."

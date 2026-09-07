@@ -12,6 +12,17 @@ I like to click pictures of moments or things that I always want to keep with me
 
 Commits to master and PRs are automatically built and deployed by Netlify
 
+## Testing on your local network
+
+By default, `next dev` only accepts requests from `localhost`, and the admin
+API points the browser at `localhost:4000` — neither works from a phone on
+the same Wi-Fi network.
+
+To fix this, copy `.env.local.example` to `.env.local` and set the three
+values to your machine's LAN IP (find it with `ipconfig getifaddr en0` on
+macOS Wi-Fi). Then run `npm run dev` and open the printed `Network:` URL on
+your phone.
+
 ## Features
 
 ### Collections

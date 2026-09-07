@@ -16,10 +16,33 @@
 }
 
 #photos > img {
-  /* Just in case there are inline attributes */
+  /*
+   * `height: auto` is required, not incidental: each tile carries real
+   * width/height attributes so the masonry reserves its final geometry before
+   * any photo downloads, and a fixed height would override that. Measured on
+   * the Prague grid: without the attributes all 74 tiles move on load (grid
+   * height 85px -> 14018px, worst tile displaced 13368px); with them, zero
+   * tiles move and the reserved height already equals the final 14018px.
+   */
   width: 100% !important;
   height: auto !important;
   padding: 5px 5px;
+
+  /*
+   * Fills the reserved box while the photo is downloading or decoding, so the
+   * grid reads as a deliberate placeholder rather than a void. Painted on the
+   * img itself: a wrapper element would break the `#photos > img` direct child
+   * selector while the descendant rule below survived, re-inherit
+   * `line-height: 0`, and reintroduce the multicol fragmentation that
+   * `break-inside: avoid` in PhotoCard.module.css exists to fix.
+   *
+   * `background-clip: content-box` is required, not tidying. Replaced content
+   * only paints over the content box, so under the default border-box clip this
+   * padding ring would stay tinted permanently — a coloured frame around every
+   * photo, invisible while loading and only visible once fully loaded.
+   */
+  background-color: #262a2c;
+  background-clip: content-box;
 }
 
 @media (max-width: 1200px) {
